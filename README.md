@@ -5,4 +5,4 @@ GIới thiệu thành viên nhóm:
   - Vũ Đức Mạnh       20225649
   - Lương Anh Minh    20225650
   - Đỗ Tuấn Minh      20225741
-  - Đinh Đức Minh     20215085
+  - Đinh Đức Mạnh     20215085
