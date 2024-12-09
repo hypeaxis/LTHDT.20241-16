@@ -1,0 +1,14 @@
+update 8/12:
+- Tất cả các thuộc tính có type là "double" đều được khai báo lại là "float"
+- Xóa class Shape, merge mọi thuộc tính vào MainObject:
+	Xét thấy sự tồn tại của class shape chưa rõ ràng và chưa thể hiện được sự cần thiết, nên tôi đã loại bỏ và thay thế bằng cách biến lớp "Cube" và "Cylinder" trở thành lớp con trực tiếp của MainObject. Khi tạo một đối tượng mới, chúng ta sẽ kiểm tra người dùng muốn đối tượng nào, sau đó tạo đối tượng tương ứng.
+- Tạo interface Calculator:
+	Nhận thấy các phương thức tính toán được gọi lại cho cả 2 lớp hình học, nên tôi đã tạo một interface Calculator để chứa các phương thức tính toán chung. Các phương thức được gọi là giống nhau, nhưng các vận hành sẽ được định nghĩa gắn liền với lớp đối tượng.
+- Định nghĩa lại interface Force:
+	Có vẻ như Force được sử dụng giống như là một lớp cha thì đúng hơn là một interface.
+- Bổ sung Normal Force:
+	Thành phần quan trọng để tính Friction Force.
+
+
+update 9/12:
+- các thuộc tính cơ bản của MainObject cần thiết cho hành động thiết lập MainObject của user đã được bổ sung đầy đủ, đề nghị phát triển chức năng thiết lập vật thể.
