@@ -12,3 +12,13 @@ update 8/12:
 
 update 9/12:
 - các thuộc tính cơ bản của MainObject cần thiết cho hành động thiết lập MainObject của user đã được bổ sung đầy đủ, đề nghị phát triển chức năng thiết lập vật thể.
+
+update 10/12:
+- Thêm mới lớp Surface để lưu trữ các hệ số ma sát tĩnh và động. phục vụ mục đích thiết lập và thay đổi hệ số ma sát sau này, thay cho việc phải thao tác trong lớp Friction.
+- xây dựng các constructors, getters and setters cần thiết trong package force.
+- xây dựng các hàm tính toán:
+	hàm reserve() trong class Force: trả về String là hướng ngược lại của lực dược gọi(left,right).
+	tính gravity force dựa trên MainObject;
+	tính Normal force dựa trên gravityforce;
+	tính Friction dựa trên các hệ số ma sát của surface, phản lực, applied force và type của MainObject.
+	
