@@ -11,8 +11,9 @@ public class Friction extends Force{
 		super();
 	}
 	
-	
-	public void calculate(Surface surface, MainObject obj, NormalForce N, AppliedForce F) {
+
+	public void calculateFriction(Surface surface, MainObject obj, NormalForce N, AppliedForce F) {
+
 		
 		this.setDirection(F.reverse());
 		if(obj instanceof Cube) {

@@ -1,5 +1,6 @@
 package mainObject;
 
+
 import force.AppliedForce;
 import force.Friction;
 
@@ -48,6 +49,6 @@ public class Cylinder extends MainObject /*implements Calculator*/{
 		this.angularPosition += this.angularVelosity * deltatime;
 		
 	}
-	
+
 	
 }
