@@ -1,5 +1,8 @@
 package mainObject;
 
+import force.AppliedForce;
+import force.Friction;
+
 public class Cube extends MainObject/* implements Calculator*/{
 	private static float MAXLENGTH = 100;
 	private float sizeLength;
@@ -24,6 +27,14 @@ public class Cube extends MainObject/* implements Calculator*/{
 			return;
 		}
 		this.sizeLength = sizeLength;
+	}
+
+
+
+	@Override
+	public void updateRotationMotion(AppliedForce F, Friction friction, float deltatime) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

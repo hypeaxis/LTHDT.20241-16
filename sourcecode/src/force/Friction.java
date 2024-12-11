@@ -11,8 +11,9 @@ public class Friction extends Force{
 		super();
 	}
 	
-	
+
 	public void calculateFriction(Surface surface, MainObject obj, NormalForce N, AppliedForce F) {
+
 		
 		this.setDirection(F.reverse());
 		if(obj instanceof Cube) {
@@ -29,8 +30,8 @@ public class Friction extends Force{
 				this.setValue(N.getValue() * surface.getKineticCoefficient());
 			}
 		}
-		
-//		this.setValue(surface.getKineticCoefficient() * N.getValue());
-//		this.setDirection(F.reverse());
+
 	}
+
+
 }
