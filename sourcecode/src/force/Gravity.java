@@ -12,7 +12,6 @@ public class Gravity extends Force{
 		this.setDirection("down");
 		this.setValue(10 * obj.getMass());
 	}
-=======
-public class Gravity extends Force{
+
 	
 }
