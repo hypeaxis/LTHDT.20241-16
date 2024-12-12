@@ -1,5 +1,6 @@
 package mainObject;
 
+
 import force.AppliedForce;
 import force.Friction;
 
@@ -38,4 +39,5 @@ public class Cube extends MainObject/* implements Calculator*/{
 	}
 	
 	
+
 }

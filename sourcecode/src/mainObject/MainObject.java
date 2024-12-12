@@ -1,5 +1,6 @@
 package mainObject;
 
+
 import force.AppliedForce;
 import force.Friction;
 
@@ -49,4 +50,5 @@ public abstract class MainObject {
 	
 	public abstract void updateRotationMotion(AppliedForce F, Friction friction, float deltatime);
 	
+
 }

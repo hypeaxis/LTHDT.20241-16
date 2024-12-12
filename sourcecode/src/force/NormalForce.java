@@ -2,6 +2,7 @@ package force;
 
 public class NormalForce extends Force{
 
+
 	public NormalForce() {
 		super();
 	}
@@ -10,5 +11,6 @@ public class NormalForce extends Force{
 		this.setDirection("up");
 		this.setValue(P.getValue());
 	}
+
 	
 }
