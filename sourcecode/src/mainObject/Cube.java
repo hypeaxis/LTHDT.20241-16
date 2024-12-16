@@ -3,34 +3,37 @@ package mainObject;
 
 import force.AppliedForce;
 import force.Friction;
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.SimpleFloatProperty;
 
 public class Cube extends MainObject/* implements Calculator*/{
-	private static float MAXLENGTH = 100;
-	private float sizeLength;
+	private static float MAXLENGTH = 300;
+	private FloatProperty sideLength = new SimpleFloatProperty();
 
 
 
-	public Cube(float mass, float sizeLength) {
-		super(mass);
-		this.sizeLength = sizeLength;
+	public Cube(float sizeLength) {
+		super();
+		this.sideLength.set(sizeLength);
 	}
-
 
 
 	public float getSizeLength() {
-		return sizeLength;
+		return sideLength.get();
 	}
 
 
 
-	public void setSizeLength(float sizeLength) {
-		if(sizeLength > MAXLENGTH) {
+	public void setSizeLength(float sideLength) {
+		if(sideLength > MAXLENGTH) {
 			return;
 		}
-		this.sizeLength = sizeLength;
+		this.sideLength.set(sideLength);
 	}
 
-
+	public FloatProperty sidelengthProperty() {
+		return sideLength;
+	}
 
 	@Override
 	public void updateRotationMotion(AppliedForce F, Friction friction, float deltatime) {
