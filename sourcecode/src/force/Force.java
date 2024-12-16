@@ -8,21 +8,17 @@ public abstract class Force {
 		
 	}
 
-
 	public float getValue() {
 		return value;
 	}
-
 
 	public String getDirection() {
 		return direction;
 	}
 
-
 	public void setValue(float value) {
 		this.value = value;
 	}
-
 
 	public void setDirection(String direction) {
 		this.direction = direction;
@@ -38,5 +34,4 @@ public abstract class Force {
 		return null;
 	}
 	
-
 }
