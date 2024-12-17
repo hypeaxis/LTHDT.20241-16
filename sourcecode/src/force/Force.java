@@ -1,37 +1,30 @@
 package force;
 
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.SimpleFloatProperty;
+
 public abstract class Force {
-	private float value;
-	private String direction;
+	private FloatProperty value = new SimpleFloatProperty();
+
 	
 	public Force() {
 		
 	}
 
 	public float getValue() {
+		return value.get();
+	}
+	
+	public FloatProperty getValueProperty() {
 		return value;
 	}
 
-	public String getDirection() {
-		return direction;
-	}
 
 	public void setValue(float value) {
-		this.value = value;
+		this.value.set(value);
 	}
 
-	public void setDirection(String direction) {
-		this.direction = direction;
-	}
-	
-	public String reverse() {
-		if(this.direction.equals("left")) {
-			return "right";
-		}
-		if(this.direction.equals("right")) {
-			return "left";
-		}
-		return null;
-	}
+
+
 	
 }
