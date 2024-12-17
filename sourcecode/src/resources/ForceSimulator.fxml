@@ -18,7 +18,7 @@
 
 <Pane fx:id="border" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simulator.Controller">
    <children>
-      <ImageView fx:id="surface" fitHeight="240.0" fitWidth="1200.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="background" fitHeight="240.0" fitWidth="1200.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/background.png" />
          </image>
@@ -26,7 +26,7 @@
             <Cursor fx:constant="DEFAULT" />
          </cursor>
       </ImageView>
-      <ImageView fx:id="surface2" fitHeight="240.0" fitWidth="1200.0" layoutX="1200.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="background2" fitHeight="240.0" fitWidth="1200.0" layoutX="1200.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/background.png" />
          </image>
@@ -96,8 +96,8 @@
                   <RowConstraints maxHeight="76.0" minHeight="10.0" prefHeight="52.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <TextField fx:id="appliedField" prefHeight="31.0" prefWidth="207.0" />
-                  <Slider fx:id="appliedSlider" min="-100.0" showTickLabels="true" showTickMarks="true" GridPane.rowIndex="1" />
+                  <TextField fx:id="appliedField" disable="true" prefHeight="31.0" prefWidth="207.0" />
+                  <Slider fx:id="appliedSlider" disable="true" max="500.0" min="-500.0" showTickLabels="true" showTickMarks="true" GridPane.rowIndex="1" />
                </children>
                <GridPane.margin>
                   <Insets bottom="20.0" left="40.0" right="40.0" />
@@ -124,10 +124,10 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <TextField GridPane.columnIndex="1" />
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Slider GridPane.columnIndex="2" />
-                  <Slider GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <TextField fx:id="staticField" GridPane.columnIndex="1" />
+                  <TextField fx:id="kineticField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Slider fx:id="staticSlider" max="10.0" GridPane.columnIndex="2" />
+                  <Slider fx:id="kineticSlider" max="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                </children>
                <GridPane.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" />
@@ -151,22 +151,12 @@
             <Image url="@../images/wheel.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="applied" fitHeight="30.0" fitWidth="200.0" layoutX="628.0" layoutY="420.0" pickOnBounds="true">
+      <ImageView fx:id="applied" fitHeight="30.0" fitWidth="100.0" pickOnBounds="true" visible="false">
          <image>
             <Image url="@../images/force.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="friction" fitHeight="30.0" fitWidth="200.0" layoutX="600.0" layoutY="180.0" pickOnBounds="true" rotate="180.0">
-         <image>
-            <Image url="@../images/force.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="gravity" fitHeight="30.0" fitWidth="200.0" layoutX="600.0" layoutY="180.0" pickOnBounds="true" rotate="90.0">
-         <image>
-            <Image url="@../images/force.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="normal" fitHeight="30.0" fitWidth="200.0" layoutX="351.0" layoutY="225.0" pickOnBounds="true" rotate="270.0">
+      <ImageView fx:id="friction" fitHeight="30.0" fitWidth="100.0" pickOnBounds="true" rotate="180.0" visible="false">
          <image>
             <Image url="@../images/force.png" />
          </image>

@@ -8,9 +8,9 @@ import javafx.beans.property.SimpleFloatProperty;
 
 public abstract class MainObject {
 	private FloatProperty mass = new SimpleFloatProperty();
-	private float position;
-	private float velocity;
-	private float acceleration;
+	private float position = 0;
+	private float velocity = 0;
+	private float acceleration = 0;
 	
 	public MainObject() {
 		// TODO Auto-generated constructor stub
@@ -32,6 +32,9 @@ public abstract class MainObject {
 		return mass.get();
 	}
 
+	public FloatProperty getMassProperty() {
+		return mass;
+	}
 
 	public void setMass(float mass) {
 		this.mass.set(mass);
