@@ -52,6 +52,7 @@ public class Controller {
 	TextField kineticField;
 	@FXML
 	Slider kineticSlider;
+
 	
 	private double Xdistance = 0;
 	private double Ydistance = 0;
@@ -149,7 +150,7 @@ public class Controller {
 	        }
 	    });
 	}
-	
+	 
 	public void updateFrictionPosition(Friction fric, AppliedForce force) {
 		if (fric.getValue() == 0) {
 	        friction.setVisible(false);
@@ -286,9 +287,16 @@ public class Controller {
 	    appliedField.textProperty().bindBidirectional(appliedForce.getValueProperty(), new NumberStringConverter());
 	    
 	    
+	//ktra nhap va xu li ngoai le
 	    appliedField.textProperty().addListener((obs, oldValue, newValue) -> {
-	        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
-	            appliedField.setText(oldValue);
+	        try {
+	            //  ktra gtri moi co hop le ko
+	            if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+	                throw new IllegalArgumentException("Invalid input in appliedField");
+	            }
+	            appliedField.setStyle(""); // tra ve mau trang
+	        } catch (IllegalArgumentException e) {
+	            appliedField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
 	        }
 	    });
 	    
@@ -299,10 +307,16 @@ public class Controller {
 		staticField.textProperty().bindBidirectional(surface.getStaticProperty(), new NumberStringConverter());
 		
 		staticField.textProperty().addListener((obs, oldValue, newValue) -> {
-	        if (!newValue.matches("\\d*(\\.\\d*)?")) {
-	            staticField.setText(oldValue);
-	        }
-	    });
+		    try {
+		        // ktra gtri moi co hop le ko
+		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+		            throw new IllegalArgumentException("Invalid input in staticField");
+		        }
+		        staticField.setStyle(""); //tra ve mau trang
+		    } catch (IllegalArgumentException e) {
+		        staticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
+		    }
+		});
 		
 		surface.getStaticProperty().addListener(listener);
 		
@@ -311,10 +325,16 @@ public class Controller {
 		kineticField.textProperty().bindBidirectional(surface.getKineticProperty(), new NumberStringConverter());
 		
 		kineticField.textProperty().addListener((obs, oldValue, newValue) -> {
-	        if (!newValue.matches("\\d*(\\.\\d*)?")) {
-	            kineticField.setText(oldValue);
-	        }
-	    });
+		    try {
+		        // ktra gtri moi co hop le ko
+		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+		            throw new IllegalArgumentException("Invalid input in kineticField");
+		        }
+		        kineticField.setStyle(""); // tra ve mau trang
+		    } catch (IllegalArgumentException e) {
+		        kineticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
+		    }
+		});;
 		
 		surface.getKineticProperty().addListener(listener);
 	    
@@ -344,10 +364,10 @@ public class Controller {
 		);
 		
 		timeline.setCycleCount(Timeline.INDEFINITE);
-		timeline.play();
+		timeline.play(); 
 		
 		
 		
 		
-	}
-}
+	} 
+} 
