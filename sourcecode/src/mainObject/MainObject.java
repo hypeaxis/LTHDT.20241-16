@@ -8,9 +8,9 @@ import javafx.beans.property.SimpleFloatProperty;
 
 public abstract class MainObject {
 	private FloatProperty mass = new SimpleFloatProperty();
-	private float position = 0;
-	private float velocity = 0;
-	private float acceleration = 0;
+	private FloatProperty position = new SimpleFloatProperty();
+	private FloatProperty velocity = new SimpleFloatProperty();
+	private FloatProperty acceleration = new SimpleFloatProperty();
 	
 	public MainObject() {
 		// TODO Auto-generated constructor stub
@@ -21,11 +21,6 @@ public abstract class MainObject {
 		this.mass.set(mass);
 	}
 	
-	public MainObject(float mass, float position) {
-		super();
-		this.mass.set(mass);
-		this.position = position;
-	}
 
 
 	public float getMass() {
@@ -41,20 +36,35 @@ public abstract class MainObject {
 	}
 	
 	public float getPosition() {
-		return position;
+		return position.get();
 	}
 
 	public float getVelocity() {
+		return velocity.get();
+	}
+	
+	public float getAcceleration() {
+		return acceleration.get();
+	}
+	
+	public FloatProperty getPositionProperty() {
+		return position;
+	}
+	
+	public FloatProperty getVelocityProperty() {
 		return velocity;
 	}
 	
+	public FloatProperty getAccelerationProperty() {
+		return acceleration;
+	}
 	
 	public void updateTranslationMotion(AppliedForce F, Friction friction, float deltatime) {
-		this.acceleration = (F.getValue() - friction.getValue()) / this.mass.get();
+		this.acceleration.set((F.getValue() - friction.getValue()) / this.mass.get());;
 		
-		this.velocity += this.acceleration * deltatime;
+		this.velocity.set(this.velocity.get() + this.acceleration.get() * deltatime);
 		
-		this.position += this.velocity * deltatime;
+		this.position.set(this.position.get() + this.velocity.get() * deltatime);
 	}
 
 	

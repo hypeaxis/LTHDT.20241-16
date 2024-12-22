@@ -9,9 +9,9 @@ import javafx.beans.property.SimpleFloatProperty;
 public class Cylinder extends MainObject /*implements Calculator*/{
 	private static float MAXRADIUS = 150;
 	private FloatProperty radius = new SimpleFloatProperty();
-	private float angularPosition;
-	private float angularVelosity;
-	private float angularAcceleration;
+	private FloatProperty angularPosition = new SimpleFloatProperty();
+	private FloatProperty angularVelocity = new SimpleFloatProperty();
+	private FloatProperty angularAcceleration = new SimpleFloatProperty();
 
 
 	public Cylinder(float radius) {
@@ -26,10 +26,29 @@ public class Cylinder extends MainObject /*implements Calculator*/{
 	
 
 	public float getAngularPosition() {
+		return angularPosition.get();
+	}
+	
+	public float getAngularVelocity() {
+		return angularVelocity.get();
+	}
+	
+	public float getAngularAcceleration() {
+		return angularAcceleration.get();
+	}
+	
+	public FloatProperty getAngularPositionProperty() {
 		return angularPosition;
 	}
 
-
+	public FloatProperty getAngularVelocityProperty() {
+		return angularVelocity;
+	}
+	
+	public FloatProperty getAngularAccelerationProperty() {
+		return angularAcceleration;
+	}
+	
 	public void setRadius(float radius) {
 		if(radius > MAXRADIUS) {
 			return;
@@ -41,13 +60,14 @@ public class Cylinder extends MainObject /*implements Calculator*/{
 		return radius;
 	}
 
+
 	@Override
 	public void updateRotationMotion(AppliedForce F, Friction friction, float deltatime) {
-		this.angularAcceleration = 2 * (friction.getValue()) / (this.getMass() * this.radius.get() * this.radius.get());
+		this.angularAcceleration.set(2 * (friction.getValue()) / (this.getMass() * this.radius.get() * this.radius.get()));
 		
-		this.angularVelosity += this.angularAcceleration * deltatime;
+		this.angularVelocity.set(this.angularVelocity.get() + this.angularAcceleration.get() * deltatime);
 		
-		this.angularPosition += this.angularVelosity * deltatime;
+		this.angularPosition.set(this.angularPosition.get() + this.angularVelocity.get() * deltatime);
 		
 	}
 
