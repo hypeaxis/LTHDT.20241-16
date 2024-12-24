@@ -14,6 +14,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -52,6 +54,18 @@ public class Controller {
 	TextField kineticField;
 	@FXML
 	Slider kineticSlider;
+	@FXML
+	CheckBox forceCheckBox;
+	@FXML
+	CheckBox massCheckBox;
+	@FXML
+	CheckBox motionCheckBox;
+	@FXML
+	CheckBox typeCheckBox;
+	@FXML
+	MainObject selectedObject;
+	
+
 	
 	private double Xdistance = 0;
 	private double Ydistance = 0;
@@ -71,59 +85,68 @@ public class Controller {
 	NormalForce normal = new NormalForce();
 	Friction frictionForce = new Friction();	
 	
-	public void setDraggable(ImageView obj, MainObject object) {
-		double localX = obj.getLayoutX();
-		double localY = obj.getLayoutY();
-		edge = obj.getFitHeight();
-		obj.setOnMousePressed(event -> {
-			Xdistance = event.getSceneX() - obj.getLayoutX();
-			Ydistance = event.getSceneY() - obj.getLayoutY();
-			startY = obj.getLayoutY();
-			isdragged = false;
-		});
-		obj.setOnMouseDragged(event -> {
-			obj.setLayoutX(event.getSceneX() - Xdistance);
-			obj.setLayoutY(event.getSceneY() - Ydistance);
-			isdragged = true;
-		});
-		obj.setOnMouseReleased(event -> {
-			
-			if(!isdragged ) {
-				return;
-			}
-			
-			if(localY == startY) {
-				if(numberOfObjects.get() == 0 && obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
-					obj.setLayoutX(Xdrop - obj.getFitHeight()/2);
-					obj.setLayoutY(Ydrop - obj.getFitWidth());
-					numberOfObjects.set(1);
-					if(object instanceof mainObject.Cube) {
-						typeOfObject.set("Cube");
-					} else if(object instanceof mainObject.Cylinder) {
-						typeOfObject.set("Cylinder");
-					}
-				} else {
-					obj.setLayoutX(localX);
-					obj.setLayoutY(localY);
-				}
-			} else {
-				if(obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
-					obj.setLayoutX(Xdrop - obj.getFitHeight()/2);
-					obj.setLayoutY(Ydrop - obj.getFitWidth());
-				} else {
-					obj.setLayoutX(localX);
-					obj.setLayoutY(localY);
-					if(object instanceof mainObject.Cube) {
-						((mainObject.Cube) object).setSizeLength((float) edge);
-					} else if(object instanceof mainObject.Cylinder) {
-						((mainObject.Cylinder) object).setRadius((float) edge/2);
-					}
-					object.setMass(0);
-					numberOfObjects.set(0);
-				}
-			}
-		});
+	private void showPopup(String title, String content) {
+	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	    alert.setTitle(title);
+	    alert.setHeaderText(null);
+	    alert.setContentText(content);
+	    alert.showAndWait();
 	}
+	
+	public void setDraggable(ImageView obj, MainObject object) {
+	    double localX = obj.getLayoutX();
+	    double localY = obj.getLayoutY();
+	    edge = obj.getFitHeight();
+	    obj.setOnMousePressed(event -> {
+	        Xdistance = event.getSceneX() - obj.getLayoutX();
+	        Ydistance = event.getSceneY() - obj.getLayoutY();
+	        startY = obj.getLayoutY();
+	        isdragged = false;
+	    });
+	    obj.setOnMouseDragged(event -> {
+	        obj.setLayoutX(event.getSceneX() - Xdistance);
+	        obj.setLayoutY(event.getSceneY() - Ydistance);
+	        isdragged = true;
+	    });
+	    obj.setOnMouseReleased(event -> {
+	        if (!isdragged) return;
+
+	        // Gán đối tượng được chọn
+	        selectedObject = object;
+
+	        if (localY == startY) {
+	            if (numberOfObjects.get() == 0 && obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
+	                obj.setLayoutX(Xdrop - obj.getFitHeight() / 2);
+	                obj.setLayoutY(Ydrop - obj.getFitWidth());
+	                numberOfObjects.set(1);
+	                if (object instanceof mainObject.Cube) {
+	                    typeOfObject.set("Cube");
+	                } else if (object instanceof mainObject.Cylinder) {
+	                    typeOfObject.set("Cylinder");
+	                }
+	            } else {
+	                obj.setLayoutX(localX);
+	                obj.setLayoutY(localY);
+	            }
+	        } else {
+	            if (obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
+	                obj.setLayoutX(Xdrop - obj.getFitHeight() / 2);
+	                obj.setLayoutY(Ydrop - obj.getFitWidth());
+	            } else {
+	                obj.setLayoutX(localX);
+	                obj.setLayoutY(localY);
+	                if (object instanceof mainObject.Cube) {
+	                    ((mainObject.Cube) object).setSizeLength((float) edge);
+	                } else if (object instanceof mainObject.Cylinder) {
+	                    ((mainObject.Cylinder) object).setRadius((float) edge / 2);
+	                }
+	                object.setMass(0);
+	                numberOfObjects.set(0);
+	            }
+	        }
+	    });
+	}
+
 	
 	public void showInputDialog(ImageView obj, String content, Consumer<Float> callback) {
 		TextField field = new TextField();
@@ -149,7 +172,7 @@ public class Controller {
 	        }
 	    });
 	}
-	
+	 
 	public void updateFrictionPosition(Friction fric, AppliedForce force) {
 		if (fric.getValue() == 0) {
 	        friction.setVisible(false);
@@ -185,6 +208,7 @@ public class Controller {
 	        applied.setFitWidth(-force.getValue());
 	    }
 	}
+	
 	
 	
 	public void initialize() {
@@ -241,6 +265,40 @@ public class Controller {
 	    	});	    	
 	    });
 	    
+	    forceCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            String forceDetails = String.format(
+	                "Applied Force: %.2f N\nNormal Force: %.2f N\nGravity: %.2f N\nFriction: %.2f N",
+	                appliedForce.getValue(), normal.getValue(), gravity.getValue(), frictionForce.getValue()
+	            );
+	            showPopup("Forces Information", forceDetails);
+	        }
+	    });
+
+	    motionCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            String motionDetails = String.format(
+	                "Velocity: %.2f m/s\n",
+	                selectedObject.getVelocity()
+	            );
+	            showPopup("Motion Information", motionDetails);
+	        }
+	    });
+
+	    massCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            String massDetails = String.format("Mass: %.2f kg", selectedObject.getMass());
+	            showPopup("Mass Information", massDetails);
+	        }
+	    });
+
+	    typeCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            String typeDetails = "Object Type: " + (selectedObject instanceof mainObject.Cube ? "Cube" : "Cylinder");
+	            showPopup("Object Type Information", typeDetails);
+	        }
+	    });
+	    
 		numberOfObjects.addListener((obs, oldVal, newVal) -> {
 			if(newVal.intValue() == 1) {
 				appliedField.setDisable(false);
@@ -286,9 +344,16 @@ public class Controller {
 	    appliedField.textProperty().bindBidirectional(appliedForce.getValueProperty(), new NumberStringConverter());
 	    
 	    
+	//ktra nhap va xu li ngoai le
 	    appliedField.textProperty().addListener((obs, oldValue, newValue) -> {
-	        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
-	            appliedField.setText(oldValue);
+	        try {
+	            //  ktra gtri moi co hop le ko
+	            if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+	                throw new IllegalArgumentException("Invalid input in appliedField");
+	            }
+	            appliedField.setStyle(""); // tra ve mau trang
+	        } catch (IllegalArgumentException e) {
+	            appliedField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
 	        }
 	    });
 	    
@@ -299,10 +364,16 @@ public class Controller {
 		staticField.textProperty().bindBidirectional(surface.getStaticProperty(), new NumberStringConverter());
 		
 		staticField.textProperty().addListener((obs, oldValue, newValue) -> {
-	        if (!newValue.matches("\\d*(\\.\\d*)?")) {
-	            staticField.setText(oldValue);
-	        }
-	    });
+		    try {
+		        // ktra gtri moi co hop le ko
+		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+		            throw new IllegalArgumentException("Invalid input in staticField");
+		        }
+		        staticField.setStyle(""); //tra ve mau trang
+		    } catch (IllegalArgumentException e) {
+		        staticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
+		    }
+		});
 		
 		surface.getStaticProperty().addListener(listener);
 		
@@ -311,10 +382,16 @@ public class Controller {
 		kineticField.textProperty().bindBidirectional(surface.getKineticProperty(), new NumberStringConverter());
 		
 		kineticField.textProperty().addListener((obs, oldValue, newValue) -> {
-	        if (!newValue.matches("\\d*(\\.\\d*)?")) {
-	            kineticField.setText(oldValue);
-	        }
-	    });
+		    try {
+		        // ktra gtri moi co hop le ko
+		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+		            throw new IllegalArgumentException("Invalid input in kineticField");
+		        }
+		        kineticField.setStyle(""); // tra ve mau trang
+		    } catch (IllegalArgumentException e) {
+		        kineticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
+		    }
+		});;
 		
 		surface.getKineticProperty().addListener(listener);
 	    
@@ -344,10 +421,10 @@ public class Controller {
 		);
 		
 		timeline.setCycleCount(Timeline.INDEFINITE);
-		timeline.play();
+		timeline.play(); 
 		
 		
 		
 		
-	}
-}
+	} 
+} 

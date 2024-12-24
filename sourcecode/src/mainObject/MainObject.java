@@ -48,6 +48,10 @@ public abstract class MainObject {
 		return velocity;
 	}
 	
+	public float getAcceleration() {
+		return acceleration;
+	}
+	
 	
 	public void updateTranslationMotion(AppliedForce F, Friction friction, float deltatime) {
 		this.acceleration = (F.getValue() - friction.getValue()) / this.mass.get();
