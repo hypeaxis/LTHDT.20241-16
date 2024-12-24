@@ -286,6 +286,10 @@ public class Controller {
 	    appliedField.textProperty().bindBidirectional(appliedSlider.valueProperty(), new NumberStringConverter());
 	    appliedField.textProperty().bindBidirectional(appliedForce.getValueProperty(), new NumberStringConverter());
 	    
+	  //  Đoan code nay su dung listener (trinh lang nghe) đe theo doi su thay đoi gia tri trong truong van bn (appliedField) 
+	 // va thuc hien kiem tra tinh hop le của gia tri moi đuoc nhap. 
+	//no kiem tra xem gia tri moi co tuan theo đinh dang so hop le (bao gom so am, so nguyen hoac so thcc) hay khong
+	    
 	    
 	//ktra nhap va xu li ngoai le neu thanh cong hoac khong thanh cong
 	    appliedField.textProperty().addListener((obs, oldValue, newValue) -> {
