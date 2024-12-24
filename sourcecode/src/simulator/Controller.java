@@ -285,8 +285,13 @@ public class Controller {
 		appliedSlider.valueProperty().bindBidirectional(appliedForce.getValueProperty());
 	    appliedField.textProperty().bindBidirectional(appliedSlider.valueProperty(), new NumberStringConverter());
 	    appliedField.textProperty().bindBidirectional(appliedForce.getValueProperty(), new NumberStringConverter());
-	    
-	    
+	
+	    // Doan code nay su dung listener (trinh lang nghe) de theo doi su thay doi gia tri
+	    // huc hien kiem tra tinh hop le cua gia tri moi duoc nhap.
+	    //Kiem tra xem gia tri moi co tuan theo dinh dang so hop le (bao gom so am, so nguyen hoac so thuc) hay khong
+	   // Neu khong, truong nhap lieu se thay doi giao dien de bao loi cho nguoi dung.
+
+
 	//ktra nhap va xu li ngoai le neu thanh cong hoac khong thanh cong
 	    appliedField.textProperty().addListener((obs, oldValue, newValue) -> {
 	        try {
