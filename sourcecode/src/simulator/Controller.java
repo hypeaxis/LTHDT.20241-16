@@ -287,10 +287,10 @@ public class Controller {
 	    appliedField.textProperty().bindBidirectional(appliedForce.getValueProperty(), new NumberStringConverter());
 	    
 	    
-	//ktra nhap va xu li ngoai le
+	//ktra nhap va xu li ngoai le neu thanh cong hoac khong thanh cong
 	    appliedField.textProperty().addListener((obs, oldValue, newValue) -> {
 	        try {
-	            //  ktra gtri moi co hop le ko
+	            //  ktra gtri moi co hop le ko .neu khong thi se mau do
 	            if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
 	                throw new IllegalArgumentException("Invalid input in appliedField");
 	            }
@@ -308,7 +308,7 @@ public class Controller {
 		
 		staticField.textProperty().addListener((obs, oldValue, newValue) -> {
 		    try {
-		        // ktra gtri moi co hop le ko
+		        // ktra gtri moi co hop le ko newValue la gia tri moi
 		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
 		            throw new IllegalArgumentException("Invalid input in staticField");
 		        }
@@ -326,7 +326,7 @@ public class Controller {
 		
 		kineticField.textProperty().addListener((obs, oldValue, newValue) -> {
 		    try {
-		        // ktra gtri moi co hop le ko
+		        // ktra gtri moi co hop le ko, hop le thi giu nguyen khong thi hien do
 		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
 		            throw new IllegalArgumentException("Invalid input in kineticField");
 		        }
