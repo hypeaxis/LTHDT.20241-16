@@ -2,7 +2,6 @@ package simulator;
 
 import java.util.function.Consumer;
 import force.AppliedForce;
-import force.Force;
 import force.Friction;
 import force.Gravity;
 import force.NormalForce;
@@ -10,9 +9,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -31,7 +27,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.NumberStringConverter;
 import mainObject.MainObject;
-import mainObject.Reset;
 import surface.Surface;
 
 public class Controller {
@@ -84,6 +79,8 @@ public class Controller {
 	private VBox buttonBox;
 	
 	MainObject selectedObject;
+
+
 	private Label velocityLabel = new Label("Velocity: 0 m/s");
 	private Label accelerationLabel = new Label("Acceleration: 0 m/s²");
 
@@ -170,6 +167,7 @@ public class Controller {
 	    }
 	}
 	
+
 	public void setDraggable(ImageView obj, MainObject object) {
 	    double localX = obj.getLayoutX();
 	    double localY = obj.getLayoutY();
@@ -613,7 +611,7 @@ public class Controller {
 	        });
 	    }
 
-		    
+		
 
 		
 	} 
