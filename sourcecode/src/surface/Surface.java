@@ -1,25 +1,38 @@
 package surface;
 
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.SimpleFloatProperty;
+
 public class Surface {
-	private float kineticCoefficient;
-	private float staticCoefficient;
+	private FloatProperty kineticCoefficient = new SimpleFloatProperty(0);
+	private FloatProperty staticCoefficient = new SimpleFloatProperty(0);
 	
 	
-	public Surface(float kineticCoefficient, float staticCoefficient) {
-		super();
-		this.kineticCoefficient = kineticCoefficient;
-		this.staticCoefficient = staticCoefficient;
-	}
-
-
-	public float getKineticCoefficient() {
+	public FloatProperty getKineticProperty() {
 		return kineticCoefficient;
 	}
-
-
-	public float getStaticCoefficient() {
+	public FloatProperty getStaticProperty() {
 		return staticCoefficient;
 	}
+	
+	public float getKineticCoefficient() {
+		return kineticCoefficient.get();
+	}
+	
+	public float getStaticCoefficient() {
+		return staticCoefficient.get();
+	}
+	
+	public void setKineticCoefficient(float kineticCoefficient) {
+		this.kineticCoefficient.set(kineticCoefficient);
+	}
+	public void setStaticCoefficient(float staticCoefficent) {
+		this.staticCoefficient.set(staticCoefficent);
+	}
+	
+
+
+	
 	
 	
 }

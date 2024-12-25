@@ -1,14 +1,18 @@
 package force;
 
-public class AppliedForce extends Force{
+public class AppliedForce extends Force {
 
-
-	public AppliedForce(float value, String direction) {
+	public AppliedForce() {
 		super();
-		this.setDirection(direction);
-		this.setValue(value);
 	}
-	
-	
 
+	@Override
+	public void setValue(float value) {
+		super.setValue(value);  // Gọi phương thức setValue của lớp cha (Force)
+	}
+
+	@Override
+	public float getValue() {
+		return super.getValue();  // Gọi phương thức getValue của lớp cha (Force)
+	}
 }

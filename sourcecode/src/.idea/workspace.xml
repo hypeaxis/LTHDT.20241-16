@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8571c47a-7c3d-4a33-a0ba-631ae6c746d5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../.gitconfig" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.idea/LTHDT.20241-16.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.vscode/launch.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../.vscode/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ForceSimulator.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/force/.classpath" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/force/.project" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/.project" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/../.classpath" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.project" beforeDir="false" afterPath="$PROJECT_DIR$/../.project" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/force/AppliedForce.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/force/AppliedForce.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/force/Force.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/force/Force.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/force/Friction.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/force/Friction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/force/Gravity.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/force/Gravity.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/force/NormalForce.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/force/NormalForce.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/mainObject/Cube.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/mainObject/Cube.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/mainObject/Cylinder.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/mainObject/Cylinder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/mainObject/MainObject.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/mainObject/MainObject.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/simulator/ForceSimulator.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/simulator/ForceSimulator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bin/surface/Surface.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bin/surface/Surface.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/force/AppliedForce.java" beforeDir="false" afterPath="$PROJECT_DIR$/force/AppliedForce.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mainObject/Cube.java" beforeDir="false" afterPath="$PROJECT_DIR$/mainObject/Cube.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mainObject/Cylinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/mainObject/Cylinder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/ForceSimulator.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/ForceSimulator.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulator/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/simulator/Controller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulator/ForceSimulator.java" beforeDir="false" afterPath="$PROJECT_DIR$/simulator/ForceSimulator.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2qi48sCJTY5p6S2fM17L7OaA5uF" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin/LTHDT.20241-16/sourcecode&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8571c47a-7c3d-4a33-a0ba-631ae6c746d5" name="Changes" comment="" />
+      <created>1735131905298</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1735131905298</updated>
+      <workItem from="1735131906296" duration="34000" />
+      <workItem from="1735142426688" duration="7000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -14,28 +14,44 @@ public class Friction extends Force{
 
 	public void calculateFriction(Surface surface, MainObject obj, NormalForce N, AppliedForce F) {
 
-		
-		this.setDirection(F.reverse());
-		if(obj instanceof Cube) {
-			if(F.getValue() <= N.getValue() * surface.getStaticCoefficient()) {
-				this.setValue(F.getValue());
+		if(obj.getVelocity() == 0) {
+			
+			if(F.getValue()>=0) {
+				if(obj instanceof Cube) {
+					if(F.getValue() <= N.getValue() * surface.getStaticCoefficient()) {
+						this.setValue(F.getValue());
+					} else {
+						this.setValue(N.getValue() * surface.getKineticCoefficient());
+					}
+				}
+				if(obj instanceof Cylinder) {
+					if(F.getValue() <= 3 * N.getValue() * surface.getStaticCoefficient()) {
+						this.setValue(F.getValue()/3);
+					} else {
+						this.setValue(N.getValue() * surface.getKineticCoefficient());
+					}
+				}
 			} else {
-				this.setValue(N.getValue() * surface.getKineticCoefficient());
+				if(obj instanceof Cube) {
+					if(-F.getValue() <= N.getValue() * surface.getStaticCoefficient()) {
+						this.setValue(-F.getValue());
+					} else {
+						this.setValue(N.getValue() * surface.getKineticCoefficient());
+					}
+				}
+				if(obj instanceof Cylinder) {
+					if(-F.getValue() <= 3 * N.getValue() * surface.getStaticCoefficient()) {
+						this.setValue(-F.getValue()/3);
+					} else {
+						this.setValue(N.getValue() * surface.getKineticCoefficient());
+					}
+				}
 			}
-		}
-		if(obj instanceof Cylinder) {
-			if(F.getValue() <= 3 * N.getValue() * surface.getStaticCoefficient()) {
-				this.setValue(F.getValue()/3);
-			} else {
-				this.setValue(N.getValue() * surface.getKineticCoefficient());
-			}
+			
+			
 		}
 
 	}
 
 
-=======
-public class Friction extends Force{
-	private float kineticCoefficient;
-	private float staticCoefficient;
 }
