@@ -37,6 +37,7 @@
       <VBox layoutX="980.0" layoutY="45.0" prefHeight="304.0" prefWidth="189.0">
          <children>
             <CheckBox fx:id="forceCheckBox" mnemonicParsing="false" prefHeight="17.0" prefWidth="94.0" selected="true" text="Forces" />
+            <CheckBox fx:id="sumCheckBox" mnemonicParsing="false" text="Sum of Force" />
 			<CheckBox fx:id="massCheckBox" mnemonicParsing="false" text="Mass" />
          </children>
       </VBox>
@@ -148,6 +149,11 @@
          </image>
       </ImageView>
       <ImageView fx:id="friction" fitHeight="30.0" fitWidth="100.0" pickOnBounds="true" rotate="180.0" visible="false">
+         <image>
+            <Image url="@../images/force.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="sum" fitHeight="30.0" fitWidth="100.0" layoutX="600.0" layoutY="300.0" pickOnBounds="true" visible="false">
          <image>
             <Image url="@../images/force.png" />
          </image>

@@ -49,6 +49,8 @@ public class Controller {
 	@FXML
 	ImageView friction;
 	@FXML
+	ImageView sum;
+	@FXML
 	TextField staticField;
 	@FXML
 	Slider staticSlider;
@@ -61,9 +63,7 @@ public class Controller {
 	@FXML
 	CheckBox massCheckBox;
 	@FXML
-	CheckBox motionCheckBox;
-	@FXML
-	CheckBox typeCheckBox;
+	CheckBox sumCheckBox;
 	@FXML
 	private Label massLabel;
 	
@@ -103,7 +103,8 @@ public class Controller {
 	Gravity gravity = new Gravity();
 	NormalForce normal = new NormalForce();
 	Friction frictionForce = new Friction();
-	private boolean isVisible = true;	
+	private boolean isVisible = true;
+	private boolean isVisible2 = false;	
 	
 	private void handlePauseButton() {
 	    if (timeline.getStatus() == Timeline.Status.RUNNING) {
@@ -116,31 +117,43 @@ public class Controller {
 	}
 	
 	private void handleResetButton() {
-	    timeline.stop(); // Dừng Timeline
+	    
+		timeline.stop(); // Dừng Timeline
 
-	    // Đặt lại trạng thái của đối tượng
-	    if (selectedObject instanceof mainObject.Cube) {
-	        ((mainObject.Cube) selectedObject).reset();
-	        Cube.setLayoutX(Xdrop - Cube.getFitHeight() / 2);
-	        Cube.setLayoutY(Ydrop - Cube.getFitWidth());
-	    } else if (selectedObject instanceof mainObject.Cylinder) {
-	        ((mainObject.Cylinder) selectedObject).reset();
-	        Cylinder.setLayoutX(Xdrop - Cylinder.getFitHeight() / 2);
-	        Cylinder.setLayoutY(Ydrop - Cylinder.getFitWidth());
-	    }
+        float deltaTime = 0.016f;
+        
+        if(selectedObject instanceof mainObject.Cube) {
+        	cube.reset();
+            appliedForce.setValue(0);
+    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
+    		gravity.calculateGravity(cube);
+    		normal.calculateNormalForce(gravity);
+    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
+    		updateFrictionPosition(frictionForce);
+    		cube.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
+    		updateSumPosition(appliedForce, frictionForce);
+    		velocityLabel.setText(String.format("Velocity: %.2f m/s", cube.getVelocity()));
+            accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cube.getAcceleration()));
 
-	    // Đặt lại các giá trị của lực
-	    appliedForce.setValue(0);
-	    gravity.setValue(0);
-	    normal.setValue(0);
-	    frictionForce.setValue(0);
-
-	    // Cập nhật giao diện
-	    velocityLabel.setText("Velocity: 0 m/s");
-	    accelerationLabel.setText("Acceleration: 0 m/s²");
-	    massLabel.setVisible(false); // Ẩn mass nếu cần
-	    background.setLayoutX(0); // Đặt lại vị trí nền
-	    background2.setLayoutX(1200); // Đặt lại vị trí nền
+    	} else if (selectedObject instanceof mainObject.Cylinder) {
+        	cylinder.reset();
+        	appliedForce.setValue(0);
+    		updateAppliedPosition(appliedForce, cylinder.getRadius());
+    		gravity.calculateGravity(cylinder);
+    		normal.calculateNormalForce(gravity);
+    		frictionForce.calculateFriction(surface, cylinder, normal, appliedForce);
+    		updateFrictionPosition(frictionForce);
+    		cylinder.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
+			cylinder.updateRotationMotion(appliedForce, frictionForce, deltaTime);
+			updateSumPosition(appliedForce, frictionForce);
+			velocityLabel.setText(String.format("Velocity: %.2f m/s", cylinder.getVelocity()));
+            accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cylinder.getAcceleration()));
+            
+    	}
+        
+        
+    
+		
 	}
 	
 	private boolean areInputsValid() {
@@ -293,7 +306,32 @@ public class Controller {
 	    }
 	}
 	
-	
+	public void updateSumPosition(AppliedForce force, Friction friction) {
+		float total = force.getValue() - friction.getValue();
+		if (total == 0) {
+			sum.setVisible(false);
+		} else if (total > 0) {
+			if(isVisible2) {
+				sum.setVisible(true);
+	    	} else {
+				sum.setVisible(false);
+	    	}
+			sum.setRotate(0);
+			sum.setLayoutX(600);
+			sum.setLayoutY(300);
+			sum.setFitWidth(total);
+		} else if (total < 0) {
+			if(isVisible2) {
+				sum.setVisible(true);
+	    	} else {
+				sum.setVisible(false);
+	    	}
+			sum.setRotate(180);
+			sum.setLayoutX(600 + total);
+			sum.setLayoutY(300);
+			sum.setFitWidth(-total);
+		}
+	}
 	
 	public void initialize() {
 		Xdrop = border.getPrefWidth()/2;
@@ -395,6 +433,14 @@ public class Controller {
 	        }
 	    });
 	    
+	    sumCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if(newValue) {
+	            isVisible2  = true;
+	        } else {
+	        	isVisible2 = false;
+	        }
+	    });
+	    
 	    if (massLabel == null) {
 	        massLabel = new Label();
 	        massLabel.setStyle("-fx-background-color: white; -fx-border-color: black;");
@@ -467,42 +513,65 @@ public class Controller {
 	    
 
 	    
-		staticSlider.valueProperty().bindBidirectional(surface.getStaticProperty());
-		staticField.textProperty().bindBidirectional(staticSlider.valueProperty(), new NumberStringConverter());
-		staticField.textProperty().bindBidirectional(surface.getStaticProperty(), new NumberStringConverter());
-		
-		staticField.textProperty().addListener((obs, oldValue, newValue) -> {
+	    staticSlider.valueProperty().bindBidirectional(surface.getStaticProperty());
+	    staticField.textProperty().bindBidirectional(staticSlider.valueProperty(), new NumberStringConverter());
+	    staticField.textProperty().bindBidirectional(surface.getStaticProperty(), new NumberStringConverter());
 
-		    try {
-		        // ktra gtri moi co hop le ko
-		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
-		            throw new IllegalArgumentException("Invalid input in staticField");
-		        }
-		        staticField.setStyle(""); //tra ve mau trang
-		    } catch (IllegalArgumentException e) {
-		        staticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
-		    }
-		});
+	    kineticSlider.valueProperty().bindBidirectional(surface.getKineticProperty());
+	    kineticField.textProperty().bindBidirectional(kineticSlider.valueProperty(), new NumberStringConverter());
+	    kineticField.textProperty().bindBidirectional(surface.getKineticProperty(), new NumberStringConverter());
 
-		
+	    // Đảm bảo static >= kinetic
+	    staticSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue.doubleValue() < kineticSlider.getValue()) {
+	            staticSlider.setValue(kineticSlider.getValue());
+	        }
+	    });
 
-		
-		kineticSlider.valueProperty().bindBidirectional(surface.getKineticProperty());
-		kineticField.textProperty().bindBidirectional(kineticSlider.valueProperty(), new NumberStringConverter());
-		kineticField.textProperty().bindBidirectional(surface.getKineticProperty(), new NumberStringConverter());
-		
-		kineticField.textProperty().addListener((obs, oldValue, newValue) -> {
-		    try {
-		        // ktra gtri moi co hop le ko
-		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
-		            throw new IllegalArgumentException("Invalid input in kineticField");
-		        }
-		        kineticField.setStyle(""); // tra ve mau trang
-		    } catch (IllegalArgumentException e) {
-		        kineticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
-		    }
-		});;
-		
+	    kineticSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue.doubleValue() > staticSlider.getValue()) {
+	            kineticSlider.setValue(staticSlider.getValue());
+	        }
+	    });
+
+	    // Kiểm tra giá trị nhập vào staticField
+	    staticField.textProperty().addListener((obs, oldValue, newValue) -> {
+	        try {
+	            if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+	                throw new IllegalArgumentException("Invalid input in staticField");
+	            }
+	            double staticValue = Double.parseDouble(newValue);
+	            double kineticValue = kineticSlider.getValue();
+
+	            if (staticValue < kineticValue) {
+	                staticSlider.setValue(kineticValue); // Cập nhật giá trị static nếu nhỏ hơn kinetic
+	            }
+
+	            staticField.setStyle(""); // Trả về màu trắng nếu nhập đúng
+	        } catch (IllegalArgumentException e) {
+	            staticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu nếu nhập sai
+	        }
+	    });
+
+	    // Kiểm tra giá trị nhập vào kineticField
+	    kineticField.textProperty().addListener((obs, oldValue, newValue) -> {
+	        try {
+	            if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+	                throw new IllegalArgumentException("Invalid input in kineticField");
+	            }
+	            double kineticValue = Double.parseDouble(newValue);
+	            double staticValue = staticSlider.getValue();
+
+	            if (kineticValue > staticValue) {
+	                kineticSlider.setValue(staticValue); // Cập nhật giá trị kinetic nếu lớn hơn static
+	            }
+
+	            kineticField.setStyle(""); // Trả về màu trắng nếu nhập đúng
+	        } catch (IllegalArgumentException e) {
+	            kineticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu nếu nhập sai
+	        }
+	    });
+
 
 		timeline = new Timeline(
 		        new KeyFrame(Duration.millis(16), event -> {
@@ -519,6 +588,7 @@ public class Controller {
 			    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
 			    		updateFrictionPosition(frictionForce);
 			    		cube.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
+			    		updateSumPosition(appliedForce, frictionForce);
 			    		velocityLabel.setText(String.format("Velocity: %.2f m/s", cube.getVelocity()));
 		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cube.getAcceleration()));
 		                
@@ -550,6 +620,7 @@ public class Controller {
 			    		updateFrictionPosition(frictionForce);
 			    		cylinder.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
 						cylinder.updateRotationMotion(appliedForce, frictionForce, deltaTime);
+						updateSumPosition(appliedForce, frictionForce);
 						velocityLabel.setText(String.format("Velocity: %.2f m/s", cylinder.getVelocity()));
 		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cylinder.getAcceleration()));
 	                    
