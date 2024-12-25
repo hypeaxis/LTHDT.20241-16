@@ -36,12 +36,9 @@
       </ImageView>
       <VBox layoutX="980.0" layoutY="45.0" prefHeight="304.0" prefWidth="189.0">
          <children>
-            <CheckBox mnemonicParsing="false" prefHeight="17.0" prefWidth="94.0" text="CheckBox" />
-            <CheckBox mnemonicParsing="false" text="CheckBox" />
-            <CheckBox mnemonicParsing="false" text="CheckBox" />
-            <CheckBox mnemonicParsing="false" text="CheckBox" />
-            <CheckBox mnemonicParsing="false" text="CheckBox" />
-            <CheckBox mnemonicParsing="false" text="CheckBox" />
+            <CheckBox fx:id="forceCheckBox" mnemonicParsing="false" prefHeight="17.0" prefWidth="94.0" text="Forces" />
+			<CheckBox fx:id="massCheckBox" mnemonicParsing="false" text="Mass" />
+			<CheckBox fx:id="typeCheckBox" mnemonicParsing="false" text="Type" />
          </children>
       </VBox>
       <GridPane layoutX="80.0" layoutY="560.0" prefHeight="208.0" prefWidth="1040.0">
@@ -96,7 +93,7 @@
                   <RowConstraints maxHeight="76.0" minHeight="10.0" prefHeight="52.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <TextField fx:id="appliedField" disable="true" prefHeight="31.0" prefWidth="207.0" />
+                  <TextField fx:id="appliedField" disable="true" prefHeight="31.0" prefWidth="207.0" text="5" />
                   <Slider fx:id="appliedSlider" disable="true" max="500.0" min="-500.0" showTickLabels="true" showTickMarks="true" GridPane.rowIndex="1" />
                </children>
                <GridPane.margin>
@@ -135,12 +132,7 @@
             </GridPane>
          </children>
       </GridPane>
-      <HBox layoutX="35.0" layoutY="71.0" prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <Label text="Label" />
-            <Label text="Label" />
-         </children>
-      </HBox>
+      <HBox layoutX="35.0" layoutY="71.0" prefHeight="100.0" prefWidth="200.0" />
       <ImageView fx:id="Cube" fitHeight="100.0" fitWidth="100.0" layoutX="117.0" layoutY="650.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/box.png" />

@@ -3,14 +3,19 @@ package mainObject;
 
 import force.AppliedForce;
 import force.Friction;
+import force.Gravity;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
 public abstract class MainObject {
+
 	private FloatProperty mass = new SimpleFloatProperty(0.1f);
 	private FloatProperty position = new SimpleFloatProperty(0);
 	private FloatProperty velocity = new SimpleFloatProperty(0);
 	private FloatProperty acceleration = new SimpleFloatProperty(0);
+
+
+
 	
 	public MainObject() {
 		// TODO Auto-generated constructor stub
@@ -22,7 +27,6 @@ public abstract class MainObject {
 	}
 	
 
-
 	public float getMass() {
 		return mass.get();
 	}
@@ -32,7 +36,7 @@ public abstract class MainObject {
 	}
 
 	public void setMass(float mass) {
-		this.mass.set(mass);
+	    this.mass.set(mass); // Gán giá trị mass vào thuộc tính
 	}
 	
 	public float getPosition() {
@@ -55,6 +59,7 @@ public abstract class MainObject {
 		return velocity;
 	}
 	
+
 	public FloatProperty getAccelerationProperty() {
 		return acceleration;
 	}
@@ -68,11 +73,18 @@ public abstract class MainObject {
 			this.position.set(this.position.get() + this.velocity.get() * deltatime);
 		}
 		
+
 	}
 
-	
-	
-	public abstract void updateRotationMotion(AppliedForce F, Friction friction, float deltatime);
-	
 
+	public void updateRotationMotion(AppliedForce F, Friction friction, float deltaTime) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void setMass(FloatProperty mass, Gravity gravity) {
+	    this.mass = mass;
+
+	    // Tính lại giá trị gravity
+	    gravity.calculateGravity(this);
+	}
 }

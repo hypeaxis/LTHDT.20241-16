@@ -13,8 +13,8 @@ public class Cube extends MainObject/* implements Calculator*/{
 
 
 	public Cube(float sizeLength) {
-		super();
-		this.sideLength.set(sizeLength);
+	    super();
+	    this.sideLength.set(sizeLength);
 	}
 
 
@@ -39,6 +39,12 @@ public class Cube extends MainObject/* implements Calculator*/{
 	public void updateRotationMotion(AppliedForce F, Friction friction, float deltatime) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	public void updateTranslationMotion(AppliedForce appliedForce, Friction frictionForce, float f) {
+		// TODO Auto-generated method stub
+			
 	}
 	
 	
