@@ -8,15 +8,14 @@ import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
 public abstract class MainObject {
-	protected FloatProperty mass = new SimpleFloatProperty();
-	public float velocity = 0; // Vận tốc
-	public float position = 0; // Vị trí
-	public float acceleration = 0; // Gia tốc
 
-	// Thuộc tính cho chuyển động quay (nếu áp dụng)
-	public float angularVelocity = 0; // Vận tốc góc
-	public float angularAcceleration = 0; // Gia tốc góc
-	public float rotationAngle = 0; // Góc quay
+	private FloatProperty mass = new SimpleFloatProperty(0.1f);
+	private FloatProperty position = new SimpleFloatProperty(0);
+	private FloatProperty velocity = new SimpleFloatProperty(0);
+	private FloatProperty acceleration = new SimpleFloatProperty(0);
+
+
+
 	
 	public MainObject() {
 		// TODO Auto-generated constructor stub
@@ -27,20 +26,6 @@ public abstract class MainObject {
 		this.mass.set(mass);
 	}
 	
-	public MainObject(float mass, float position) {
-		super();
-		this.mass.set(mass);
-		this.position = position;
-	}
-
-	public double getAngularVelocity() {
-	    return angularVelocity;
-	}
-
-	public double getRotationAngle() {
-	    return rotationAngle;
-	}
-
 
 	public float getMass() {
 		return mass.get();
@@ -55,22 +40,40 @@ public abstract class MainObject {
 	}
 	
 	public float getPosition() {
-		return position;
+		return position.get();
 	}
 
 	public float getVelocity() {
-		return velocity;
+		return velocity.get();
 	}
 	
 	public float getAcceleration() {
+		return acceleration.get();
+	}
+	
+	public FloatProperty getPositionProperty() {
+		return position;
+	}
+	
+	public FloatProperty getVelocityProperty() {
+		return velocity;
+	}
+	
+
+	public FloatProperty getAccelerationProperty() {
 		return acceleration;
 	}
 	
-	
-	public void updateTranslationMotion(double appliedForce, double friction, float deltaTime) {
-	    acceleration = (float) (Math.abs(appliedForce - friction) / getMass()); // Sử dụng getMass()
-	    velocity += acceleration * deltaTime;
-	    position += velocity * deltaTime;
+	public void updateTranslationMotion(AppliedForce F, Friction friction, float deltatime) {
+		if(F != null && friction != null) {
+			this.acceleration.set((F.getValue() - friction.getValue()) / this.mass.get());;			
+			
+			this.velocity.set(this.velocity.get() + this.acceleration.get() * deltatime);
+			
+			this.position.set(this.position.get() + this.velocity.get() * deltatime);
+		}
+		
+
 	}
 
 

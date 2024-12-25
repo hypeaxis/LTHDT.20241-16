@@ -284,7 +284,7 @@ public class Controller {
 	public void updateFrictionPosition(Friction fric, AppliedForce force) {
 		if (fric.getValue() == 0) {
 	        friction.setVisible(false);
-	    } else if (force.getValue() > 0) {
+	    } else if (fric.getValue() > 0) {
 	        friction.setVisible(true);
 	        friction.setRotate(180);
 	        friction.setLayoutX(Xdrop - fric.getValue());
@@ -295,7 +295,7 @@ public class Controller {
 	        friction.setRotate(0);
 	        friction.setLayoutX(Xdrop);
 	        friction.setLayoutY(Ydrop-15);
-	        friction.setFitWidth(fric.getValue());
+	        friction.setFitWidth(-fric.getValue());
 	    }
 	}
 	
@@ -333,7 +333,8 @@ public class Controller {
 		setDraggable(Cube, cube);
 		setDraggable(Cylinder, cylinder);
 		
-		
+	    
+	    
 		ContextMenu cubeContextMenu = new ContextMenu();
 	    MenuItem cubeMenuItem1 = new MenuItem("Size-length");
 	    MenuItem cubeMenuItem2 = new MenuItem("Mass");
@@ -354,6 +355,7 @@ public class Controller {
 	    });
 	    
 	    cubeMenuItem2.setOnAction(event -> {
+
 	        showInputDialog(Cube, "Mass: ", value -> {
 	            cube.setMass(value); // Cập nhật giá trị mass cho Cube
 	            selectedObject = cube; // Cập nhật đối tượng được chọn
@@ -370,6 +372,7 @@ public class Controller {
 	    });
 	    	    
 	    cylinderMenuItem2.setOnAction(event -> {
+
 	        showInputDialog(Cylinder, "Mass: ", value -> {
 	            cylinder.setMass(value); // Cập nhật giá trị mass cho Cylinder
 	            selectedObject = cylinder; // Cập nhật đối tượng được chọn
@@ -437,6 +440,7 @@ public class Controller {
 				cylinderContextMenu.show(Cylinder, event.getScreenX(), event.getScreenY());
 	    	}
 	    });
+
 		
 	    ChangeListener<? super Number> listener = (obs, oldValue, newValue) -> {
 	    	if("Cube".equals(typeOfObject.get())) {
@@ -453,6 +457,7 @@ public class Controller {
 	    		updateFrictionPosition(frictionForce, appliedForce);
 	    	}
 	    };
+
 	    
 		
 		appliedSlider.valueProperty().bindBidirectional(appliedForce.getValueProperty());
@@ -462,6 +467,7 @@ public class Controller {
 	    
 	//ktra nhap va xu li ngoai le
 	    appliedField.textProperty().addListener((obs, oldValue, newValue) -> {
+
 	        try {
 	            //  ktra gtri moi co hop le ko
 	            if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
@@ -473,13 +479,14 @@ public class Controller {
 	        }
 	    });
 	    
-	    appliedForce.getValueProperty().addListener(listener);
+
 	    
 		staticSlider.valueProperty().bindBidirectional(surface.getStaticProperty());
 		staticField.textProperty().bindBidirectional(staticSlider.valueProperty(), new NumberStringConverter());
 		staticField.textProperty().bindBidirectional(surface.getStaticProperty(), new NumberStringConverter());
 		
 		staticField.textProperty().addListener((obs, oldValue, newValue) -> {
+
 		    try {
 		        // ktra gtri moi co hop le ko
 		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
@@ -490,8 +497,9 @@ public class Controller {
 		        staticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
 		    }
 		});
+
 		
-		surface.getStaticProperty().addListener(listener);
+
 		
 		kineticSlider.valueProperty().bindBidirectional(surface.getKineticProperty());
 		kineticField.textProperty().bindBidirectional(kineticSlider.valueProperty(), new NumberStringConverter());
@@ -509,29 +517,40 @@ public class Controller {
 		    }
 		});;
 		
-		surface.getKineticProperty().addListener(listener);
+
 	    
-		
+
 	    
+
+
 		timeline = new Timeline(
 		        new KeyFrame(Duration.millis(16), event -> {
 		            float deltaTime = 0.016f;
-
-		            if (selectedObject != null) {
-		                // Cập nhật chuyển động tịnh tiến
-		                selectedObject.updateTranslationMotion(appliedForce.getValue(), frictionForce.getValue(), deltaTime);
-
-		                // Hiển thị thông tin acceleration
-		                velocityLabel.setText(String.format("Velocity: %.2f m/s", selectedObject.getVelocity()));
-		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", selectedObject.getAcceleration()));
-
-		                // Nếu là Cylinder, hiển thị thêm thông tin quay
-		                if (selectedObject instanceof mainObject.Cylinder) {
-		                    angularVelocityLabel.setText(String.format("Angular Velocity: %.2f rad/s", ((mainObject.Cylinder) selectedObject).getAngularVelocity()));
-		                    rotationAngleLabel.setText(String.format("Rotation Angle: %.2f rad", ((mainObject.Cylinder) selectedObject).getAngularPosition()));
-		                }
-		        
-		            }
+		            
+		            if("Cube".equals(typeOfObject.get())) {
+			    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
+			    		gravity.calculateGravity(cube);
+			    		normal.calculateNormalForce(gravity);
+			    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
+			    		updateFrictionPosition(frictionForce, appliedForce);
+			    		cube.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
+			    		velocityLabel.setText(String.format("Velocity: %.2f m/s", cube.getVelocity()));
+		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cube.getAcceleration()));
+			    	} else if ("Cylinder".equals(typeOfObject.get())) {
+			    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
+			    		gravity.calculateGravity(cube);
+			    		normal.calculateNormalForce(gravity);
+			    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
+			    		updateFrictionPosition(frictionForce, appliedForce);
+			    		cylinder.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
+						cylinder.updateRotationMotion(appliedForce, frictionForce, 0.016f);
+						velocityLabel.setText(String.format("Velocity: %.2f m/s", cylinder.getVelocity()));
+		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cylinder.getAcceleration()));
+		                angularVelocityLabel.setText(String.format("Angular Velocity: %.2f rad/s", cylinder.getAngularVelocity()));
+	                    rotationAngleLabel.setText(String.format("Rotation Angle: %.2f rad", cylinder.getAngularPosition()));
+			    	}
+		            
+		            
 		        })
 		    );
 
@@ -579,7 +598,6 @@ public class Controller {
 		    });
 		    
 
-		
 		
 		
 	} 

@@ -34,24 +34,38 @@ public class Friction extends Force{
 			} else {
 				if(obj instanceof Cube) {
 					if(-F.getValue() <= N.getValue() * surface.getStaticCoefficient()) {
-						this.setValue(-F.getValue());
+						this.setValue(F.getValue());
 					} else {
-						this.setValue(N.getValue() * surface.getKineticCoefficient());
+						this.setValue(-N.getValue() * surface.getKineticCoefficient());
 					}
 				}
 				if(obj instanceof Cylinder) {
 					if(-F.getValue() <= 3 * N.getValue() * surface.getStaticCoefficient()) {
-						this.setValue(-F.getValue()/3);
+						this.setValue(F.getValue()/3);
 					} else {
-						this.setValue(N.getValue() * surface.getKineticCoefficient());
+						this.setValue(-N.getValue() * surface.getKineticCoefficient());
 					}
 				}
 			}
 			
 			
+		} else if (obj.getVelocity() > 0) {
+			
+			if(obj instanceof Cube) {
+				this.setValue(N.getValue() * surface.getKineticCoefficient());
+			}
+			if(obj instanceof Cylinder) {
+				this.setValue(N.getValue() * surface.getKineticCoefficient());
+			}
+			
+		} else {
+			if(obj instanceof Cube) {
+				this.setValue(-N.getValue() * surface.getKineticCoefficient());
+			}
+			if(obj instanceof Cylinder) {
+				this.setValue(-N.getValue() * surface.getKineticCoefficient());
+			}
 		}
-
 	}
-
 
 }

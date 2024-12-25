@@ -8,14 +8,13 @@ import javafx.beans.property.SimpleFloatProperty;
 
 public class Cube extends MainObject/* implements Calculator*/{
 	private static float MAXLENGTH = 300;
-	private FloatProperty sideLength = new SimpleFloatProperty();
+	private FloatProperty sideLength = new SimpleFloatProperty(0);
 
 
 
 	public Cube(float sizeLength) {
 	    super();
 	    this.sideLength.set(sizeLength);
-	    this.mass.set(1); // Đặt giá trị mặc định
 	}
 
 
