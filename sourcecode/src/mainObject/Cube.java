@@ -38,9 +38,9 @@ public class Cube extends MainObject/* implements Calculator*/{
 	@Override
 	public void updateRotationMotion(AppliedForce F, Friction friction, float deltatime) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
+
+
 
 }

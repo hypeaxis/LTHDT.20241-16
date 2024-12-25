@@ -1,0 +1,7 @@
+{
+    "java.project.referencedLibraries": [
+        "C:\\Users\\Admin\\Downloads\\openjfx-23.0.1_windows-x64_bin-sdk\\javafx-sdk-23.0.1\\lib"
+],
+"java.debug.settings.onBuildFailureProceed": true,
+
+}
