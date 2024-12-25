@@ -6,10 +6,10 @@ import force.Friction;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
-public class Cylinder extends MainObject /*implements Calculator*/{
+public class Cylinder extends MainObject implements Reset{
 	private static float MAXRADIUS = 150;
 
-	private FloatProperty radius = new SimpleFloatProperty(0);
+	private FloatProperty radius = new SimpleFloatProperty(50);
 	private FloatProperty angularPosition = new SimpleFloatProperty(0);
 	private FloatProperty angularVelocity = new SimpleFloatProperty(0);
 	private FloatProperty angularAcceleration = new SimpleFloatProperty(0);
@@ -63,11 +63,22 @@ public class Cylinder extends MainObject /*implements Calculator*/{
 		return radius;
 	}
 
-
 	@Override
-
+	public void reset() {
+		this.setMass(0.1f);
+		this.setPosition(0);
+		this.setVelocity(0);
+		this.setAcceleration(0);
+		this.radius.set(50);
+		this.angularPosition.set(0);
+		this.angularVelocity.set(0);
+		this.angularAcceleration.set(0);
+	}
+	
+	
+	@Override
 	public void updateRotationMotion(AppliedForce F, Friction friction, float deltatime) {
-		this.angularAcceleration.set(2 * (friction.getValue()) / (this.getMass() * this.radius.get() * this.radius.get()));
+		this.angularAcceleration.set(2000000 * (friction.getValue()) / (this.getMass() * this.radius.get() * this.radius.get()));
 		
 		this.angularVelocity.set(this.angularVelocity.get() + this.angularAcceleration.get() * deltatime);
 		
