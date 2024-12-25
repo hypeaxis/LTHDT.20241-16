@@ -14,12 +14,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.NumberStringConverter;
 import mainObject.MainObject;
@@ -52,8 +59,31 @@ public class Controller {
 	TextField kineticField;
 	@FXML
 	Slider kineticSlider;
-
+	@FXML
+	CheckBox forceCheckBox;
+	@FXML
+	CheckBox massCheckBox;
+	@FXML
+	CheckBox motionCheckBox;
+	@FXML
+	CheckBox typeCheckBox;
+	@FXML
+	MainObject selectedObject;
 	
+	@FXML
+	private VBox infoBox;
+	
+	private Stage forcesPopupStage;
+	private Stage massPopupStage;
+	private Stage typePopupStage;
+	private Label velocityLabel = new Label("Velocity: 0 m/s");
+	private Label accelerationLabel = new Label("Acceleration: 0 m/s²");
+	private Label angularVelocityLabel; // Hiển thị vận tốc góc
+	private Label rotationAngleLabel;
+	
+	private Timeline timeline;
+	private boolean isReadyToRun = false; // Cờ để xác định khi nào Timeline có thể chạy
+
 	private double Xdistance = 0;
 	private double Ydistance = 0;
 	private IntegerProperty numberOfObjects = new SimpleIntegerProperty();
@@ -72,59 +102,159 @@ public class Controller {
 	NormalForce normal = new NormalForce();
 	Friction frictionForce = new Friction();	
 	
-	public void setDraggable(ImageView obj, MainObject object) {
-		double localX = obj.getLayoutX();
-		double localY = obj.getLayoutY();
-		edge = obj.getFitHeight();
-		obj.setOnMousePressed(event -> {
-			Xdistance = event.getSceneX() - obj.getLayoutX();
-			Ydistance = event.getSceneY() - obj.getLayoutY();
-			startY = obj.getLayoutY();
-			isdragged = false;
-		});
-		obj.setOnMouseDragged(event -> {
-			obj.setLayoutX(event.getSceneX() - Xdistance);
-			obj.setLayoutY(event.getSceneY() - Ydistance);
-			isdragged = true;
-		});
-		obj.setOnMouseReleased(event -> {
-			
-			if(!isdragged ) {
-				return;
-			}
-			
-			if(localY == startY) {
-				if(numberOfObjects.get() == 0 && obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
-					obj.setLayoutX(Xdrop - obj.getFitHeight()/2);
-					obj.setLayoutY(Ydrop - obj.getFitWidth());
-					numberOfObjects.set(1);
-					if(object instanceof mainObject.Cube) {
-						typeOfObject.set("Cube");
-					} else if(object instanceof mainObject.Cylinder) {
-						typeOfObject.set("Cylinder");
-					}
-				} else {
-					obj.setLayoutX(localX);
-					obj.setLayoutY(localY);
-				}
-			} else {
-				if(obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
-					obj.setLayoutX(Xdrop - obj.getFitHeight()/2);
-					obj.setLayoutY(Ydrop - obj.getFitWidth());
-				} else {
-					obj.setLayoutX(localX);
-					obj.setLayoutY(localY);
-					if(object instanceof mainObject.Cube) {
-						((mainObject.Cube) object).setSizeLength((float) edge);
-					} else if(object instanceof mainObject.Cylinder) {
-						((mainObject.Cylinder) object).setRadius((float) edge/2);
-					}
-					object.setMass(0);
-					numberOfObjects.set(0);
-				}
-			}
-		});
+	private boolean areInputsValid() {
+	    try {
+	        // Kiểm tra đối tượng được chọn
+	        if (selectedObject == null) {
+	            return false;
+	        }
+	        // Kiểm tra mass
+	        if (selectedObject.getMass() == 0) {
+	            return false;
+	        }
+	        // Kiểm tra lực tác dụng
+	        if (appliedForce.getValue() == 0) {
+	            return false;
+	        }
+	        // Kiểm tra các hệ số ma sát
+	        if (surface.getKineticCoefficient() == 0 || surface.getStaticCoefficient() == 0) {
+	            return false;
+	        }
+	        return true; // Tất cả điều kiện thỏa mãn
+	    } catch (Exception e) {
+	        return false; // Bắt lỗi nếu có ngoại lệ
+	    }
 	}
+	
+	private void showError(String message) {
+	    Alert alert = new Alert(Alert.AlertType.ERROR);
+	    alert.setTitle("Error");
+	    alert.setHeaderText(null);
+	    alert.setContentText(message);
+	    alert.showAndWait();
+	}
+
+
+	
+	private Stage showPopup(String title, VBox contentBox, Stage existingStage) {
+	    if (existingStage != null && existingStage.isShowing()) {
+	        return existingStage; // Nếu popup đã mở, không tạo lại
+	    }
+
+	    VBox root = new VBox(10);
+	    root.setPadding(new Insets(10));
+
+	    // Thêm tiêu đề và nội dung vào giao diện
+	    root.getChildren().add(new Label(title));
+	    root.getChildren().add(contentBox);
+
+	    Scene scene = new Scene(root, 300, 200);
+
+	    Stage newStage = new Stage();
+	    newStage.setTitle(title);
+	    newStage.setScene(scene);
+
+	    // Đóng popup và gán null cho biến quản lý
+	    newStage.setOnCloseRequest(event -> {
+	        if (title.equals("Forces Information")) {
+	            forcesPopupStage = null;
+	        } else if (title.equals("Mass Information")) {
+	            massPopupStage = null;
+	        } else if (title.equals("Type Information")) {
+	            typePopupStage = null;
+	        }
+	    });
+
+	    newStage.show();
+	    return newStage;
+	}
+	
+	
+	private VBox createForcesContent() {
+	    VBox forcesBox = new VBox(10);
+
+	    Label appliedForceLabel = new Label(String.format("Applied Force: %.2f N", appliedForce.getValue()));
+	    Label normalForceLabel = new Label(String.format("Normal Force: %.2f N", normal.getValue()));
+	    Label gravityForceLabel = new Label(String.format("Gravity: %.2f N", gravity.getValue()));
+	    Label frictionForceLabel = new Label(String.format("Friction: %.2f N", frictionForce.getValue()));
+
+	    forcesBox.getChildren().addAll(appliedForceLabel, normalForceLabel, gravityForceLabel, frictionForceLabel);
+
+	    return forcesBox;
+	}
+	
+	private VBox createMassContent() {
+	    VBox massBox = new VBox(10);
+
+	    Label massLabel = new Label(String.format("Mass: %.2f kg", selectedObject.getMass()));
+	    massBox.getChildren().add(massLabel);
+
+	    return massBox;
+	}
+	
+	private VBox createTypeContent() {
+	    VBox typeBox = new VBox(10);
+
+	    String objectType = selectedObject instanceof mainObject.Cylinder ? "Cylinder" : "Cube";
+	    Label typeLabel = new Label("Object Type: " + objectType);
+	    typeBox.getChildren().add(typeLabel);
+
+	    return typeBox;
+	}
+	public void setDraggable(ImageView obj, MainObject object) {
+	    double localX = obj.getLayoutX();
+	    double localY = obj.getLayoutY();
+	    edge = obj.getFitHeight();
+	    obj.setOnMousePressed(event -> {
+	        Xdistance = event.getSceneX() - obj.getLayoutX();
+	        Ydistance = event.getSceneY() - obj.getLayoutY();
+	        startY = obj.getLayoutY();
+	        isdragged = false;
+	    });
+	    obj.setOnMouseDragged(event -> {
+	        obj.setLayoutX(event.getSceneX() - Xdistance);
+	        obj.setLayoutY(event.getSceneY() - Ydistance);
+	        isdragged = true;
+	    });
+	    obj.setOnMouseReleased(event -> {
+	        if (!isdragged) return;
+
+	        // Gán đối tượng được chọn
+	        selectedObject = object;
+
+	        if (localY == startY) {
+	            if (numberOfObjects.get() == 0 && obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
+	                obj.setLayoutX(Xdrop - obj.getFitHeight() / 2);
+	                obj.setLayoutY(Ydrop - obj.getFitWidth());
+	                numberOfObjects.set(1);
+	                if (object instanceof mainObject.Cube) {
+	                    typeOfObject.set("Cube");
+	                } else if (object instanceof mainObject.Cylinder) {
+	                    typeOfObject.set("Cylinder");
+	                }
+	            } else {
+	                obj.setLayoutX(localX);
+	                obj.setLayoutY(localY);
+	            }
+	        } else {
+	            if (obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
+	                obj.setLayoutX(Xdrop - obj.getFitHeight() / 2);
+	                obj.setLayoutY(Ydrop - obj.getFitWidth());
+	            } else {
+	                obj.setLayoutX(localX);
+	                obj.setLayoutY(localY);
+	                if (object instanceof mainObject.Cube) {
+	                    ((mainObject.Cube) object).setSizeLength((float) edge);
+	                } else if (object instanceof mainObject.Cylinder) {
+	                    ((mainObject.Cylinder) object).setRadius((float) edge / 2);
+	                }
+	                object.setMass(0);
+	                numberOfObjects.set(0);
+	            }
+	        }
+	    });
+	}
+
 	
 	public void showInputDialog(ImageView obj, String content, Consumer<Float> callback) {
 		TextField field = new TextField();
@@ -188,6 +318,7 @@ public class Controller {
 	}
 	
 	
+	
 	public void initialize() {
 		Xdrop = border.getPrefWidth()/2;
 		Ydrop = 500;
@@ -223,10 +354,12 @@ public class Controller {
 	    });
 	    
 	    cubeMenuItem2.setOnAction(event -> {
-	    	showInputDialog(Cube, "Mass: ", value -> {
-	    		cube.setMass(value);
-	    	});	    	
+	        showInputDialog(Cube, "Mass: ", value -> {
+	            cube.setMass(value); // Cập nhật giá trị mass cho Cube
+	            selectedObject = cube; // Cập nhật đối tượng được chọn
+	        });
 	    });
+
 	    	    
 	    cylinderMenuItem1.setOnAction(event -> {
 	    	showInputDialog(Cylinder, "Radius: <= 150", value -> {
@@ -237,9 +370,49 @@ public class Controller {
 	    });
 	    	    
 	    cylinderMenuItem2.setOnAction(event -> {
-	    	showInputDialog(Cylinder, "Mass: ", value -> {
-	    		cylinder.setMass(value);
-	    	});	    	
+	        showInputDialog(Cylinder, "Mass: ", value -> {
+	            cylinder.setMass(value); // Cập nhật giá trị mass cho Cylinder
+	            selectedObject = cylinder; // Cập nhật đối tượng được chọn
+	        });
+	    });
+	    
+	    
+	    
+	    // Tạo VBox chứa velocityLabel và positionLabel
+	    VBox infoBox = new VBox(10); // Khoảng cách giữa các nhãn
+	    infoBox.setLayoutX(10); // Vị trí X
+	    infoBox.setLayoutY(10); // Vị trí Y
+	    infoBox.getChildren().addAll(velocityLabel, accelerationLabel); // Thay đổi nhãn
+	    border.getChildren().add(infoBox);
+	    
+	    forceCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            VBox forcesContent = createForcesContent();
+	            forcesPopupStage = showPopup("Forces Information", forcesContent, forcesPopupStage);
+	        } else if (forcesPopupStage != null) {
+	            forcesPopupStage.close();
+	            forcesPopupStage = null;
+	        }
+	    });
+	    
+	    massCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            VBox massContent = createMassContent();
+	            massPopupStage = showPopup("Mass Information", massContent, massPopupStage);
+	        } else if (massPopupStage != null) {
+	            massPopupStage.close();
+	            massPopupStage = null;
+	        }
+	    });
+	    
+	    typeCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            VBox typeContent = createTypeContent();
+	            typePopupStage = showPopup("Type Information", typeContent, typePopupStage);
+	        } else if (typePopupStage != null) {
+	            typePopupStage.close();
+	            typePopupStage = null;
+	        }
 	    });
 	    
 		numberOfObjects.addListener((obs, oldVal, newVal) -> {
@@ -285,17 +458,12 @@ public class Controller {
 		appliedSlider.valueProperty().bindBidirectional(appliedForce.getValueProperty());
 	    appliedField.textProperty().bindBidirectional(appliedSlider.valueProperty(), new NumberStringConverter());
 	    appliedField.textProperty().bindBidirectional(appliedForce.getValueProperty(), new NumberStringConverter());
-	
-	    // Doan code nay su dung listener (trinh lang nghe) de theo doi su thay doi gia tri
-	    // huc hien kiem tra tinh hop le cua gia tri moi duoc nhap.
-	    //Kiem tra xem gia tri moi co tuan theo dinh dang so hop le (bao gom so am, so nguyen hoac so thuc) hay khong
-	   // Neu khong, truong nhap lieu se thay doi giao dien de bao loi cho nguoi dung.
-
-
-	//ktra nhap va xu li ngoai le neu thanh cong hoac khong thanh cong
+	    
+	    
+	//ktra nhap va xu li ngoai le
 	    appliedField.textProperty().addListener((obs, oldValue, newValue) -> {
 	        try {
-	            //  ktra gtri moi co hop le ko .neu khong thi se mau do
+	            //  ktra gtri moi co hop le ko
 	            if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
 	                throw new IllegalArgumentException("Invalid input in appliedField");
 	            }
@@ -313,7 +481,7 @@ public class Controller {
 		
 		staticField.textProperty().addListener((obs, oldValue, newValue) -> {
 		    try {
-		        // ktra gtri moi co hop le ko newValue la gia tri moi
+		        // ktra gtri moi co hop le ko
 		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
 		            throw new IllegalArgumentException("Invalid input in staticField");
 		        }
@@ -331,7 +499,7 @@ public class Controller {
 		
 		kineticField.textProperty().addListener((obs, oldValue, newValue) -> {
 		    try {
-		        // ktra gtri moi co hop le ko, hop le thi giu nguyen khong thi hien do
+		        // ktra gtri moi co hop le ko
 		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
 		            throw new IllegalArgumentException("Invalid input in kineticField");
 		        }
@@ -345,32 +513,72 @@ public class Controller {
 	    
 		
 	    
-		Timeline timeline = new Timeline(
-			new KeyFrame(Duration.millis(16), event -> {
+		timeline = new Timeline(
+		        new KeyFrame(Duration.millis(16), event -> {
+		            float deltaTime = 0.016f;
 
-				
-				if("Cube".equals(typeOfObject.get())) {
-					cube.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
-					System.out.println(cube.getPosition());
-				} else if ("Cylinder".equals(typeOfObject.get())) {
-					cylinder.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
-					cylinder.updateRotationMotion(appliedForce, frictionForce, 0.016f);
-				}
+		            if (selectedObject != null) {
+		                // Cập nhật chuyển động tịnh tiến
+		                selectedObject.updateTranslationMotion(appliedForce.getValue(), frictionForce.getValue(), deltaTime);
 
-					background.setLayoutX(background.getLayoutX() - 2);
-					background2.setLayoutX(background2.getLayoutX() - 2);
-				if(background.getLayoutX() <= -1200) {
-					background.setLayoutX(background2.getLayoutX() + 1200);
-				}
-				if(background2.getLayoutX() <= -1200) {
-					background2.setLayoutX(background.getLayoutX() + 1200);
-				}
-			})
-		);
-		
-		timeline.setCycleCount(Timeline.INDEFINITE);
-		timeline.play(); 
-		
+		                // Hiển thị thông tin acceleration
+		                velocityLabel.setText(String.format("Velocity: %.2f m/s", selectedObject.getVelocity()));
+		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", selectedObject.getAcceleration()));
+
+		                // Nếu là Cylinder, hiển thị thêm thông tin quay
+		                if (selectedObject instanceof mainObject.Cylinder) {
+		                    angularVelocityLabel.setText(String.format("Angular Velocity: %.2f rad/s", ((mainObject.Cylinder) selectedObject).getAngularVelocity()));
+		                    rotationAngleLabel.setText(String.format("Rotation Angle: %.2f rad", ((mainObject.Cylinder) selectedObject).getAngularPosition()));
+		                }
+		        
+		            }
+		        })
+		    );
+
+		    timeline.setCycleCount(Timeline.INDEFINITE);
+
+
+		    appliedForce.getValueProperty().addListener((observable, oldValue, newValue) -> {
+		        if (areInputsValid() && !isReadyToRun) {
+		            isReadyToRun = true;
+		            timeline.play(); // Chạy Timeline khi đủ điều kiện
+		        }
+		    });
+
+		    // Listener cho hệ số ma sát
+		    surface.getStaticProperty().addListener((observable, oldValue, newValue) -> {
+		        if (areInputsValid() && !isReadyToRun) {
+		            isReadyToRun = true;
+		            timeline.play();
+		        }
+		    });
+
+		    surface.getKineticProperty().addListener((observable, oldValue, newValue) -> {
+		        if (areInputsValid() && !isReadyToRun) {
+		            isReadyToRun = true;
+		            timeline.play();
+		        }
+		    });
+
+		    // Listener cho mass
+		    if (selectedObject != null) {
+		        selectedObject.getMassProperty().addListener((observable, oldValue, newValue) -> {
+		            if (areInputsValid() && !isReadyToRun) {
+		                isReadyToRun = true;
+		                timeline.play();
+		            }
+		        });
+		    }
+
+		    // Listener cho loại đối tượng
+		    typeOfObject.addListener((observable, oldValue, newValue) -> {
+		        if (areInputsValid() && !isReadyToRun) {
+		            isReadyToRun = true;
+		            timeline.play();
+		        }
+		    });
+		    
+
 		
 		
 		

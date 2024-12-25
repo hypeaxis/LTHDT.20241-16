@@ -10,13 +10,14 @@ public class Cylinder extends MainObject /*implements Calculator*/{
 	private static float MAXRADIUS = 150;
 	private FloatProperty radius = new SimpleFloatProperty();
 	private float angularPosition;
-	private float angularVelosity;
-	private float angularAcceleration;
+	private float angularVelocity;
+	float angularAcceleration;
 
 
 	public Cylinder(float radius) {
-		super();
-		this.radius.set(radius);
+	    super();
+	    this.radius.set(radius);
+	    this.mass.set(1); // Đặt giá trị mặc định
 	}
 
 
@@ -42,12 +43,18 @@ public class Cylinder extends MainObject /*implements Calculator*/{
 	}
 
 	@Override
-	public void updateRotationMotion(AppliedForce F, Friction friction, float deltatime) {
+	public void updateRotationMotion(AppliedForce F, Friction friction, float deltaTime) {
 		this.angularAcceleration = 2 * (friction.getValue()) / (this.getMass() * this.radius.get() * this.radius.get());
 		
-		this.angularVelosity += this.angularAcceleration * deltatime;
+		this.angularVelocity += this.angularAcceleration * deltaTime;
 		
-		this.angularPosition += this.angularVelosity * deltatime;
+		this.angularPosition += this.angularVelocity * deltaTime;
+		
+	}
+
+
+	public void updateTranslationMotion(AppliedForce appliedForce, Friction frictionForce, float f) {
+		// TODO Auto-generated method stub
 		
 	}
 
