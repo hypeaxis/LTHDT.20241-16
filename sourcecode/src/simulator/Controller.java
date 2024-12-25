@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -30,6 +31,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.NumberStringConverter;
 import mainObject.MainObject;
+import mainObject.Reset;
 import surface.Surface;
 
 public class Controller {
@@ -68,18 +70,23 @@ public class Controller {
 	@FXML
 	CheckBox typeCheckBox;
 	@FXML
-	MainObject selectedObject;
+	private Label massLabel;
 	
 	@FXML
 	private VBox infoBox;
 	
-	private Stage forcesPopupStage;
-	private Stage massPopupStage;
-	private Stage typePopupStage;
+	@FXML
+	private Button pauseButton;
+
+	@FXML
+	private Button resetButton;
+
+	private VBox buttonBox;
+	
+	MainObject selectedObject;
 	private Label velocityLabel = new Label("Velocity: 0 m/s");
 	private Label accelerationLabel = new Label("Acceleration: 0 m/s²");
-	private Label angularVelocityLabel; // Hiển thị vận tốc góc
-	private Label rotationAngleLabel;
+
 	
 	private Timeline timeline;
 	private boolean isReadyToRun = false; // Cờ để xác định khi nào Timeline có thể chạy
@@ -92,15 +99,52 @@ public class Controller {
 	private double Xdrop;
 	private double Ydrop;
 	private final String RED = "-fx-border-color: red;";
-	private double edge;
-	private StringProperty typeOfObject = new SimpleStringProperty();
 	mainObject.Cube cube = new mainObject.Cube(100);
 	mainObject.Cylinder cylinder = new mainObject.Cylinder(50);
     Surface surface = new Surface();
 	AppliedForce appliedForce = new AppliedForce();
 	Gravity gravity = new Gravity();
 	NormalForce normal = new NormalForce();
-	Friction frictionForce = new Friction();	
+	Friction frictionForce = new Friction();
+	private boolean isVisible = true;	
+	
+	private void handlePauseButton() {
+	    if (timeline.getStatus() == Timeline.Status.RUNNING) {
+	        timeline.pause();
+	        pauseButton.setText("Resume"); // Đổi nút thành Resume
+	    } else {
+	        timeline.play();
+	        pauseButton.setText("Pause"); // Đổi nút lại thành Pause
+	    }
+	}
+	
+	private void handleResetButton() {
+	    timeline.stop(); // Dừng Timeline
+
+	    // Đặt lại trạng thái của đối tượng
+	    if (selectedObject instanceof mainObject.Cube) {
+	        ((mainObject.Cube) selectedObject).reset();
+	        Cube.setLayoutX(Xdrop - Cube.getFitHeight() / 2);
+	        Cube.setLayoutY(Ydrop - Cube.getFitWidth());
+	    } else if (selectedObject instanceof mainObject.Cylinder) {
+	        ((mainObject.Cylinder) selectedObject).reset();
+	        Cylinder.setLayoutX(Xdrop - Cylinder.getFitHeight() / 2);
+	        Cylinder.setLayoutY(Ydrop - Cylinder.getFitWidth());
+	    }
+
+	    // Đặt lại các giá trị của lực
+	    appliedForce.setValue(0);
+	    gravity.setValue(0);
+	    normal.setValue(0);
+	    frictionForce.setValue(0);
+
+	    // Cập nhật giao diện
+	    velocityLabel.setText("Velocity: 0 m/s");
+	    accelerationLabel.setText("Acceleration: 0 m/s²");
+	    massLabel.setVisible(false); // Ẩn mass nếu cần
+	    background.setLayoutX(0); // Đặt lại vị trí nền
+	    background2.setLayoutX(1200); // Đặt lại vị trí nền
+	}
 	
 	private boolean areInputsValid() {
 	    try {
@@ -126,85 +170,9 @@ public class Controller {
 	    }
 	}
 	
-	private void showError(String message) {
-	    Alert alert = new Alert(Alert.AlertType.ERROR);
-	    alert.setTitle("Error");
-	    alert.setHeaderText(null);
-	    alert.setContentText(message);
-	    alert.showAndWait();
-	}
-
-
-	
-	private Stage showPopup(String title, VBox contentBox, Stage existingStage) {
-	    if (existingStage != null && existingStage.isShowing()) {
-	        return existingStage; // Nếu popup đã mở, không tạo lại
-	    }
-
-	    VBox root = new VBox(10);
-	    root.setPadding(new Insets(10));
-
-	    // Thêm tiêu đề và nội dung vào giao diện
-	    root.getChildren().add(new Label(title));
-	    root.getChildren().add(contentBox);
-
-	    Scene scene = new Scene(root, 300, 200);
-
-	    Stage newStage = new Stage();
-	    newStage.setTitle(title);
-	    newStage.setScene(scene);
-
-	    // Đóng popup và gán null cho biến quản lý
-	    newStage.setOnCloseRequest(event -> {
-	        if (title.equals("Forces Information")) {
-	            forcesPopupStage = null;
-	        } else if (title.equals("Mass Information")) {
-	            massPopupStage = null;
-	        } else if (title.equals("Type Information")) {
-	            typePopupStage = null;
-	        }
-	    });
-
-	    newStage.show();
-	    return newStage;
-	}
-	
-	
-	private VBox createForcesContent() {
-	    VBox forcesBox = new VBox(10);
-
-	    Label appliedForceLabel = new Label(String.format("Applied Force: %.2f N", appliedForce.getValue()));
-	    Label normalForceLabel = new Label(String.format("Normal Force: %.2f N", normal.getValue()));
-	    Label gravityForceLabel = new Label(String.format("Gravity: %.2f N", gravity.getValue()));
-	    Label frictionForceLabel = new Label(String.format("Friction: %.2f N", frictionForce.getValue()));
-
-	    forcesBox.getChildren().addAll(appliedForceLabel, normalForceLabel, gravityForceLabel, frictionForceLabel);
-
-	    return forcesBox;
-	}
-	
-	private VBox createMassContent() {
-	    VBox massBox = new VBox(10);
-
-	    Label massLabel = new Label(String.format("Mass: %.2f kg", selectedObject.getMass()));
-	    massBox.getChildren().add(massLabel);
-
-	    return massBox;
-	}
-	
-	private VBox createTypeContent() {
-	    VBox typeBox = new VBox(10);
-
-	    String objectType = selectedObject instanceof mainObject.Cylinder ? "Cylinder" : "Cube";
-	    Label typeLabel = new Label("Object Type: " + objectType);
-	    typeBox.getChildren().add(typeLabel);
-
-	    return typeBox;
-	}
 	public void setDraggable(ImageView obj, MainObject object) {
 	    double localX = obj.getLayoutX();
 	    double localY = obj.getLayoutY();
-	    edge = obj.getFitHeight();
 	    obj.setOnMousePressed(event -> {
 	        Xdistance = event.getSceneX() - obj.getLayoutX();
 	        Ydistance = event.getSceneY() - obj.getLayoutY();
@@ -219,19 +187,14 @@ public class Controller {
 	    obj.setOnMouseReleased(event -> {
 	        if (!isdragged) return;
 
-	        // Gán đối tượng được chọn
-	        selectedObject = object;
+
 
 	        if (localY == startY) {
 	            if (numberOfObjects.get() == 0 && obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
 	                obj.setLayoutX(Xdrop - obj.getFitHeight() / 2);
 	                obj.setLayoutY(Ydrop - obj.getFitWidth());
 	                numberOfObjects.set(1);
-	                if (object instanceof mainObject.Cube) {
-	                    typeOfObject.set("Cube");
-	                } else if (object instanceof mainObject.Cylinder) {
-	                    typeOfObject.set("Cylinder");
-	                }
+	    	        selectedObject = object;
 	            } else {
 	                obj.setLayoutX(localX);
 	                obj.setLayoutY(localY);
@@ -243,13 +206,12 @@ public class Controller {
 	            } else {
 	                obj.setLayoutX(localX);
 	                obj.setLayoutY(localY);
-	                if (object instanceof mainObject.Cube) {
-	                    ((mainObject.Cube) object).setSizeLength((float) edge);
-	                } else if (object instanceof mainObject.Cylinder) {
-	                    ((mainObject.Cylinder) object).setRadius((float) edge / 2);
-	                }
-	                object.setMass(0);
 	                numberOfObjects.set(0);
+	                if (object instanceof mainObject.Cube) {
+	                    ((mainObject.Cube) object).reset();
+	                } else if (object instanceof mainObject.Cylinder) {
+	                    ((mainObject.Cylinder) object).reset();
+	                }
 	            }
 	        }
 	    });
@@ -281,17 +243,25 @@ public class Controller {
 	    });
 	}
 	 
-	public void updateFrictionPosition(Friction fric, AppliedForce force) {
+	public void updateFrictionPosition(Friction fric) {
 		if (fric.getValue() == 0) {
 	        friction.setVisible(false);
 	    } else if (fric.getValue() > 0) {
-	        friction.setVisible(true);
+	    	if(isVisible) {
+	    		friction.setVisible(true);
+	    	} else {
+	    		friction.setVisible(false);
+	    	}
 	        friction.setRotate(180);
 	        friction.setLayoutX(Xdrop - fric.getValue());
 	        friction.setLayoutY(Ydrop-15);
 	        friction.setFitWidth(fric.getValue());
 	    } else {
-	        friction.setVisible(true);
+	    	if(isVisible) {
+	    		friction.setVisible(true);
+	    	} else {
+	    		friction.setVisible(false);
+	    	}
 	        friction.setRotate(0);
 	        friction.setLayoutX(Xdrop);
 	        friction.setLayoutY(Ydrop-15);
@@ -303,13 +273,21 @@ public class Controller {
 		if (force.getValue() == 0) {
 	        applied.setVisible(false);
 	    } else if (force.getValue() > 0) {
-	        applied.setVisible(true);
+	    	if(isVisible) {
+	    		applied.setVisible(true);
+	    	} else {
+	    		applied.setVisible(false);
+	    	}
 	        applied.setRotate(0);
 	        applied.setLayoutX(Xdrop);
 	        applied.setLayoutY(Ydrop - 15 - length);
 	        applied.setFitWidth(force.getValue());
 	    } else {
-	        applied.setVisible(true);
+	    	if(isVisible) {
+	    		applied.setVisible(true);
+	    	} else {
+	    		applied.setVisible(false);
+	    	}
 	        applied.setRotate(180);
 	        applied.setLayoutX(Xdrop + force.getValue());
 	        applied.setLayoutY(Ydrop - 15 - length);
@@ -379,7 +357,30 @@ public class Controller {
 	        });
 	    });
 	    
-	    
+	    if (pauseButton == null) pauseButton = new Button("Pause");
+	    if (resetButton == null) resetButton = new Button("Reset");
+
+	 // Tạo các nút nếu chưa có trong FXML
+	    if (pauseButton == null) pauseButton = new Button("Pause");
+	    if (resetButton == null) resetButton = new Button("Reset");
+
+	    // Tạo VBox để chứa các nút
+	    buttonBox = new VBox(10, pauseButton, resetButton); // Khoảng cách giữa các nút là 10
+	    buttonBox.setStyle("-fx-alignment: center-right;"); // Căn phải các nút
+
+	    // Đặt vị trí VBox ở giữa bên phải
+	    buttonBox.setLayoutX(border.getPrefWidth() - 100); // 100: chiều rộng ước lượng của VBox
+	    buttonBox.setLayoutY(border.getPrefHeight() / 2 - 50); // 50: chiều cao ước lượng của VBox / 2
+
+	    // Thêm VBox vào giao diện chính
+	    border.getChildren().add(buttonBox);
+
+	    // Gắn sự kiện cho nút Pause
+	    pauseButton.setOnAction(event -> handlePauseButton());
+
+	    // Gắn sự kiện cho nút Reset
+	    resetButton.setOnAction(event -> handleResetButton());
+	
 	    
 	    // Tạo VBox chứa velocityLabel và positionLabel
 	    VBox infoBox = new VBox(10); // Khoảng cách giữa các nhãn
@@ -389,32 +390,37 @@ public class Controller {
 	    border.getChildren().add(infoBox);
 	    
 	    forceCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue) {
-	            VBox forcesContent = createForcesContent();
-	            forcesPopupStage = showPopup("Forces Information", forcesContent, forcesPopupStage);
-	        } else if (forcesPopupStage != null) {
-	            forcesPopupStage.close();
-	            forcesPopupStage = null;
+	        if(newValue) {
+	            isVisible = true;
+	        } else {
+	        	isVisible = false;
 	        }
 	    });
+	    
+	    if (massLabel == null) {
+	        massLabel = new Label();
+	        massLabel.setStyle("-fx-background-color: white; -fx-border-color: black;");
+	        massLabel.setVisible(false); // Ban đầu ẩn Label
+	        border.getChildren().add(massLabel); // Thêm vào giao diện
+	    }
 	    
 	    massCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
 	        if (newValue) {
-	            VBox massContent = createMassContent();
-	            massPopupStage = showPopup("Mass Information", massContent, massPopupStage);
-	        } else if (massPopupStage != null) {
-	            massPopupStage.close();
-	            massPopupStage = null;
-	        }
-	    });
-	    
-	    typeCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue) {
-	            VBox typeContent = createTypeContent();
-	            typePopupStage = showPopup("Type Information", typeContent, typePopupStage);
-	        } else if (typePopupStage != null) {
-	            typePopupStage.close();
-	            typePopupStage = null;
+	            // Khi tick vào checkbox, hiển thị giá trị mass
+	            if (selectedObject != null) {
+	                massLabel.setText(String.format("%.2f kg", selectedObject.getMass()));
+
+	                // Đặt vị trí Label ở giữa vật thể
+	                double centerX = Cube.getLayoutX() + Cube.getFitWidth() / 2 - massLabel.getWidth() / 2;
+	                double centerY = Cube.getLayoutY() + Cube.getFitHeight() / 2 - massLabel.getHeight() / 2;
+
+	                massLabel.setLayoutX(centerX);
+	                massLabel.setLayoutY(centerY);
+	                massLabel.setVisible(true);
+	            }
+	        } else {
+	            // Khi bỏ tick, ẩn Label
+	            massLabel.setVisible(false);
 	        }
 	    });
 	    
@@ -440,24 +446,6 @@ public class Controller {
 				cylinderContextMenu.show(Cylinder, event.getScreenX(), event.getScreenY());
 	    	}
 	    });
-
-		
-	    ChangeListener<? super Number> listener = (obs, oldValue, newValue) -> {
-	    	if("Cube".equals(typeOfObject.get())) {
-	    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
-	    		gravity.calculateGravity(cube);
-	    		normal.calculateNormalForce(gravity);
-	    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
-	    		updateFrictionPosition(frictionForce, appliedForce);
-	    	} else if ("Cylinder".equals(typeOfObject.get())) {
-	    		updateAppliedPosition(appliedForce, cylinder.getRadius());
-	    		gravity.calculateGravity(cylinder);
-	    		normal.calculateNormalForce(gravity);
-	    		frictionForce.calculateFriction(surface, cylinder, normal, appliedForce);
-	    		updateFrictionPosition(frictionForce, appliedForce);
-	    	}
-	    };
-
 	    
 		
 		appliedSlider.valueProperty().bindBidirectional(appliedForce.getValueProperty());
@@ -518,88 +506,115 @@ public class Controller {
 		});;
 		
 
-	    
-
-	    
-
-
 		timeline = new Timeline(
-    new KeyFrame(Duration.millis(16), event -> {
-        float deltaTime = 0.016f;
+		        new KeyFrame(Duration.millis(16), event -> {
+		            float deltaTime = 0.016f;
+		            
+		            if(selectedObject instanceof mainObject.Cube) {
+		        		if(numberOfObjects.get() == 0) {
+		            		cube.reset();
+			            	appliedForce.setValue(0);
+		        		}
+			    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
+			    		gravity.calculateGravity(cube);
+			    		normal.calculateNormalForce(gravity);
+			    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
+			    		updateFrictionPosition(frictionForce);
+			    		cube.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
+			    		velocityLabel.setText(String.format("Velocity: %.2f m/s", cube.getVelocity()));
+		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cube.getAcceleration()));
+		                
+		                
+		                background.setLayoutX(background.getLayoutX() -  cube.getVelocity()*deltaTime);
+						background2.setLayoutX(background2.getLayoutX() - cube.getVelocity()*deltaTime);
+						
+						if(background.getLayoutX() <= -1200) {
+							background.setLayoutX(background2.getLayoutX() + 1200);
+						}
+						if(background2.getLayoutX() <= -1200) {
+							background2.setLayoutX(background.getLayoutX() + 1200);
+						}
+						if(background.getLayoutX() >= 1200) {
+							background.setLayoutX(background2.getLayoutX() - 1200);
+						}
+						if(background2.getLayoutX() >= 1200) {
+							background2.setLayoutX(background.getLayoutX() - 1200);
+						}
+			    	} else if (selectedObject instanceof mainObject.Cylinder) {
+			    		if(numberOfObjects.get() == 0) {
+		            		cylinder.reset();
+		            		appliedForce.setValue(0);
+			    		}
+			    		updateAppliedPosition(appliedForce, cylinder.getRadius());
+			    		gravity.calculateGravity(cylinder);
+			    		normal.calculateNormalForce(gravity);
+			    		frictionForce.calculateFriction(surface, cylinder, normal, appliedForce);
+			    		updateFrictionPosition(frictionForce);
+			    		cylinder.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
+						cylinder.updateRotationMotion(appliedForce, frictionForce, deltaTime);
+						velocityLabel.setText(String.format("Velocity: %.2f m/s", cylinder.getVelocity()));
+		                accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cylinder.getAcceleration()));
+	                    
+	                    background.setLayoutX(background.getLayoutX() - cylinder.getVelocity()*deltaTime);
+						background2.setLayoutX(background2.getLayoutX() - cylinder.getVelocity()*deltaTime);
+						
+						if(background.getLayoutX() <= -1200) {
+							background.setLayoutX(background2.getLayoutX() + 1200);
+						}
+						if(background2.getLayoutX() <= -1200) {
+							background2.setLayoutX(background.getLayoutX() + 1200);
+						}
+						if(background.getLayoutX() >= 1200) {
+							background.setLayoutX(background2.getLayoutX() - 1200);
+						}
+						if(background2.getLayoutX() >= 1200) {
+							background2.setLayoutX(background.getLayoutX() - 1200);
+						}
+						
+						Cylinder.setRotate(cylinder.getAngularVelocity()*0.016);
+			    	}
+		            
+		            
+		        })
+		    );
 
-        if ("Cube".equals(typeOfObject.get())) {
-            updateAppliedPosition(appliedForce, cube.getSizeLength() / 2);
-            gravity.calculateGravity(cube);
-            normal.calculateNormalForce(gravity);
-            frictionForce.calculateFriction(surface, cube, normal, appliedForce);
-            updateFrictionPosition(frictionForce, appliedForce);
-            cube.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
-            
-            velocityLabel.setText(String.format("Velocity: %.2f m/s", cube.getVelocity()));
-            accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cube.getAcceleration()));
-        } else if ("Cylinder".equals(typeOfObject.get())) {
-            updateAppliedPosition(appliedForce, cylinder.getRadius());
-            gravity.calculateGravity(cylinder);
-            normal.calculateNormalForce(gravity);
-            frictionForce.calculateFriction(surface, cylinder, normal, appliedForce);
-            updateFrictionPosition(frictionForce, appliedForce);
-            
-            cylinder.updateTranslationMotion(appliedForce, frictionForce, deltaTime);
-            cylinder.updateRotationMotion(appliedForce, frictionForce, deltaTime);
-
-            velocityLabel.setText(String.format("Velocity: %.2f m/s", cylinder.getVelocity()));
-            accelerationLabel.setText(String.format("Acceleration: %.2f m/s²", cylinder.getAcceleration()));
-            angularVelocityLabel.setText(String.format("Angular Velocity: %.2f rad/s", cylinder.getAngularVelocity()));
-            rotationAngleLabel.setText(String.format("Rotation Angle: %.2f rad", cylinder.getAngularPosition()));
-        }
-    })
-);
-
-		    timeline.setCycleCount(Timeline.INDEFINITE);
+	    timeline.setCycleCount(Timeline.INDEFINITE);
 
 
-		    appliedForce.getValueProperty().addListener((observable, oldValue, newValue) -> {
-		        if (areInputsValid() && !isReadyToRun) {
-		            isReadyToRun = true;
-		            timeline.play(); // Chạy Timeline khi đủ điều kiện
-		        }
-		    });
+	    appliedForce.getValueProperty().addListener((observable, oldValue, newValue) -> {
+	        if (areInputsValid() && !isReadyToRun) {
+	            isReadyToRun = true;
+	            timeline.play(); // Chạy Timeline khi đủ điều kiện
+	        }
+	    });
 
-		    // Listener cho hệ số ma sát
-		    surface.getStaticProperty().addListener((observable, oldValue, newValue) -> {
-		        if (areInputsValid() && !isReadyToRun) {
-		            isReadyToRun = true;
-		            timeline.play();
-		        }
-		    });
+	    // Listener cho hệ số ma sát
+	    surface.getStaticProperty().addListener((observable, oldValue, newValue) -> {
+	        if (areInputsValid() && !isReadyToRun) {
+	            isReadyToRun = true;
+	            timeline.play();
+	        }
+	    });
 
-		    surface.getKineticProperty().addListener((observable, oldValue, newValue) -> {
-		        if (areInputsValid() && !isReadyToRun) {
-		            isReadyToRun = true;
-		            timeline.play();
-		        }
-		    });
+	    surface.getKineticProperty().addListener((observable, oldValue, newValue) -> {
+	        if (areInputsValid() && !isReadyToRun) {
+	            isReadyToRun = true;
+	            timeline.play();
+	        }
+	    });
 
-		    // Listener cho mass
-		    if (selectedObject != null) {
-		        selectedObject.getMassProperty().addListener((observable, oldValue, newValue) -> {
-		            if (areInputsValid() && !isReadyToRun) {
-		                isReadyToRun = true;
-		                timeline.play();
-		            }
-		        });
-		    }
+	    // Listener cho mass
+	    if (selectedObject != null) {
+	        selectedObject.getMassProperty().addListener((observable, oldValue, newValue) -> {
+	            if (areInputsValid() && !isReadyToRun) {
+	                isReadyToRun = true;
+	                timeline.play();
+	            }
+	        });
+	    }
 
-		    // Listener cho loại đối tượng
-		    typeOfObject.addListener((observable, oldValue, newValue) -> {
-		        if (areInputsValid() && !isReadyToRun) {
-		            isReadyToRun = true;
-		            timeline.play();
-		        }
-		    });
 		    
 
-		
 		
 	} 
 } 
