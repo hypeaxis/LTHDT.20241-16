@@ -14,14 +14,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.NumberStringConverter;
 import mainObject.MainObject;
@@ -65,7 +70,16 @@ public class Controller {
 	@FXML
 	MainObject selectedObject;
 	
+	private Stage forcesPopupStage;
+	private Stage motionPopupStage;
+	private Stage massPopupStage;
+	private Stage typePopupStage;
+	private Label velocityLabel = new Label("Velocity: 0 m/s");
+	private Label positionLabel = new Label("Position: 0 m");
+	private Label angularVelocityLabel; // Hiển thị vận tốc góc
+	private Label rotationAngleLabel;
 
+	
 	
 	private double Xdistance = 0;
 	private double Ydistance = 0;
@@ -85,14 +99,90 @@ public class Controller {
 	NormalForce normal = new NormalForce();
 	Friction frictionForce = new Friction();	
 	
-	private void showPopup(String title, String content) {
-	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	    alert.setTitle(title);
-	    alert.setHeaderText(null);
-	    alert.setContentText(content);
-	    alert.showAndWait();
+	private Stage showPopup(String title, VBox contentBox, Stage existingStage) {
+	    if (existingStage != null && existingStage.isShowing()) {
+	        return existingStage; // Nếu popup đã mở, không tạo lại
+	    }
+
+	    VBox root = new VBox(10);
+	    root.setPadding(new Insets(10));
+
+	    // Thêm tiêu đề và nội dung vào giao diện
+	    root.getChildren().add(new Label(title));
+	    root.getChildren().add(contentBox);
+
+	    Scene scene = new Scene(root, 300, 200);
+
+	    Stage newStage = new Stage();
+	    newStage.setTitle(title);
+	    newStage.setScene(scene);
+
+	    // Đóng popup và gán null cho biến quản lý
+	    newStage.setOnCloseRequest(event -> {
+	        if (title.equals("Forces Information")) {
+	            forcesPopupStage = null;
+	        } else if (title.equals("Motion Information")) {
+	            motionPopupStage = null;
+	        } else if (title.equals("Mass Information")) {
+	            massPopupStage = null;
+	        } else if (title.equals("Type Information")) {
+	            typePopupStage = null;
+	        }
+	    });
+
+	    newStage.show();
+	    return newStage;
 	}
 	
+	private VBox createMotionContent() {
+	    VBox motionBox = new VBox(10);
+
+	    velocityLabel = new Label("Velocity: 0 m/s");
+	    positionLabel = new Label("Position: 0 m");
+
+	    motionBox.getChildren().addAll(velocityLabel, positionLabel);
+
+	    // Nếu là Cylinder, thêm thông tin quay
+	    if (selectedObject instanceof mainObject.Cylinder) {
+	        angularVelocityLabel = new Label("Angular Velocity: 0 rad/s");
+	        rotationAngleLabel = new Label("Rotation Angle: 0 rad");
+	        motionBox.getChildren().addAll(angularVelocityLabel, rotationAngleLabel);
+	    }
+
+	    return motionBox;
+	}
+	
+	private VBox createForcesContent() {
+	    VBox forcesBox = new VBox(10);
+
+	    Label appliedForceLabel = new Label(String.format("Applied Force: %.2f N", appliedForce.getValue()));
+	    Label normalForceLabel = new Label(String.format("Normal Force: %.2f N", normal.getValue()));
+	    Label gravityForceLabel = new Label(String.format("Gravity: %.2f N", gravity.getValue()));
+	    Label frictionForceLabel = new Label(String.format("Friction: %.2f N", frictionForce.getValue()));
+
+	    forcesBox.getChildren().addAll(appliedForceLabel, normalForceLabel, gravityForceLabel, frictionForceLabel);
+
+	    return forcesBox;
+	}
+	
+	private VBox createMassContent() {
+	    VBox massBox = new VBox(10);
+
+	    Label massLabel = new Label(String.format("Mass: %.2f kg", selectedObject.getMass()));
+	    massBox.getChildren().add(massLabel);
+
+	    return massBox;
+	}
+	
+	private VBox createTypeContent() {
+	    VBox typeBox = new VBox(10);
+
+	    String objectType = selectedObject instanceof mainObject.Cylinder ? "Cylinder" : "Cube";
+	    Label typeLabel = new Label("Object Type: " + objectType);
+	    typeBox.getChildren().add(typeLabel);
+
+	    return typeBox;
+	}
 	public void setDraggable(ImageView obj, MainObject object) {
 	    double localX = obj.getLayoutX();
 	    double localY = obj.getLayoutY();
@@ -246,10 +336,12 @@ public class Controller {
 	    });
 	    
 	    cubeMenuItem2.setOnAction(event -> {
-	    	showInputDialog(Cube, "Mass: ", value -> {
-	    		cube.setMass(value);
-	    	});	    	
+	        showInputDialog(Cube, "Mass: ", value -> {
+	            cube.setMass(value); // Cập nhật giá trị mass cho Cube
+	            selectedObject = cube; // Cập nhật đối tượng được chọn
+	        });
 	    });
+
 	    	    
 	    cylinderMenuItem1.setOnAction(event -> {
 	    	showInputDialog(Cylinder, "Radius: <= 150", value -> {
@@ -260,42 +352,48 @@ public class Controller {
 	    });
 	    	    
 	    cylinderMenuItem2.setOnAction(event -> {
-	    	showInputDialog(Cylinder, "Mass: ", value -> {
-	    		cylinder.setMass(value);
-	    	});	    	
-	    });
-	    
-	    forceCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue) {
-	            String forceDetails = String.format(
-	                "Applied Force: %.2f N\nNormal Force: %.2f N\nGravity: %.2f N\nFriction: %.2f N",
-	                appliedForce.getValue(), normal.getValue(), gravity.getValue(), frictionForce.getValue()
-	            );
-	            showPopup("Forces Information", forceDetails);
-	        }
+	        showInputDialog(Cylinder, "Mass: ", value -> {
+	            cylinder.setMass(value); // Cập nhật giá trị mass cho Cylinder
+	            selectedObject = cylinder; // Cập nhật đối tượng được chọn
+	        });
 	    });
 
-	    motionCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	    forceCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
 	        if (newValue) {
-	            String motionDetails = String.format(
-	                "Velocity: %.2f m/s\n",
-	                selectedObject.getVelocity()
-	            );
-	            showPopup("Motion Information", motionDetails);
+	            VBox forcesContent = createForcesContent();
+	            forcesPopupStage = showPopup("Forces Information", forcesContent, forcesPopupStage);
+	        } else if (forcesPopupStage != null) {
+	            forcesPopupStage.close();
+	            forcesPopupStage = null;
 	        }
 	    });
+	    motionCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+	        if (newValue) {
+	            VBox motionContent = createMotionContent();
+	            motionPopupStage = showPopup("Motion Information", motionContent, motionPopupStage);
+	        } else if (motionPopupStage != null) {
+	            motionPopupStage.close();
+	            motionPopupStage = null;
+	        }
+	    });	
 
 	    massCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
 	        if (newValue) {
-	            String massDetails = String.format("Mass: %.2f kg", selectedObject.getMass());
-	            showPopup("Mass Information", massDetails);
+	            VBox massContent = createMassContent();
+	            massPopupStage = showPopup("Mass Information", massContent, massPopupStage);
+	        } else if (massPopupStage != null) {
+	            massPopupStage.close();
+	            massPopupStage = null;
 	        }
 	    });
-
+	    
 	    typeCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
 	        if (newValue) {
-	            String typeDetails = "Object Type: " + (selectedObject instanceof mainObject.Cube ? "Cube" : "Cylinder");
-	            showPopup("Object Type Information", typeDetails);
+	            VBox typeContent = createTypeContent();
+	            typePopupStage = showPopup("Type Information", typeContent, typePopupStage);
+	        } else if (typePopupStage != null) {
+	            typePopupStage.close();
+	            typePopupStage = null;
 	        }
 	    });
 	    
@@ -398,30 +496,53 @@ public class Controller {
 		
 	    
 		Timeline timeline = new Timeline(
-			new KeyFrame(Duration.millis(16), event -> {
+			    new KeyFrame(Duration.millis(1000), event -> {
+			        float deltaTime = 1.0f; // 1000ms mỗi lần cập nhật (tương đương 1 giây)
 
-				
-				if("Cube".equals(typeOfObject.get())) {
-					cube.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
-					System.out.println(cube.getPosition());
-				} else if ("Cylinder".equals(typeOfObject.get())) {
-					cylinder.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
-					cylinder.updateRotationMotion(appliedForce, frictionForce, 0.016f);
-				}
+			        // Kiểm tra đối tượng được chọn
+			        if (selectedObject != null) {
+			            // Cập nhật chuyển động tịnh tiến
+			            selectedObject.updateTranslationMotion(appliedForce.getValue(), frictionForce.getValue(), deltaTime);
 
-					background.setLayoutX(background.getLayoutX() - 2);
-					background2.setLayoutX(background2.getLayoutX() - 2);
-				if(background.getLayoutX() <= -1200) {
-					background.setLayoutX(background2.getLayoutX() + 1200);
-				}
-				if(background2.getLayoutX() <= -1200) {
-					background2.setLayoutX(background.getLayoutX() + 1200);
-				}
-			})
-		);
+			            // Nếu đối tượng là Cylinder, cập nhật chuyển động quay
+			            if (selectedObject instanceof mainObject.Cylinder) {
+			                ((mainObject.Cylinder) selectedObject).updateRotationMotion(appliedForce, frictionForce, deltaTime);
+			            }
+
+			            // Cập nhật hiển thị thông tin trong popup Motion
+			            if (motionPopupStage != null && motionPopupStage.isShowing()) {
+			                velocityLabel.setText(String.format("Velocity: %.2f m/s", selectedObject.getVelocity()));
+			                positionLabel.setText(String.format("Position: %.2f m", selectedObject.getPosition()));
+
+			                // Hiển thị thông tin góc nếu là Cylinder
+			                if (selectedObject instanceof mainObject.Cylinder) {
+			                    angularVelocityLabel.setText(String.format("Angular Velocity: %.2f rad/s", ((mainObject.Cylinder) selectedObject).getAngularVelocity()));
+			                    rotationAngleLabel.setText(String.format("Rotation Angle: %.2f rad", ((mainObject.Cylinder) selectedObject).getAngularPosition()));
+			                }
+			            }
+			        } else {
+			            System.err.println("No selected object to update.");
+			        }
+
+			        // Di chuyển background liên tục
+			        background.setLayoutX(background.getLayoutX() - 2);
+			        background2.setLayoutX(background2.getLayoutX() - 2);
+
+			        // Kiểm tra giới hạn để tạo hiệu ứng liên tục
+			        if (background.getLayoutX() <= -1200) {
+			            background.setLayoutX(background2.getLayoutX() + 1200);
+			        }
+			        if (background2.getLayoutX() <= -1200) {
+			            background2.setLayoutX(background.getLayoutX() + 1200);
+			        }
+			    })
+			);
+
+			// Lặp vô hạn
+			timeline.setCycleCount(Timeline.INDEFINITE);
+			timeline.play();
+
 		
-		timeline.setCycleCount(Timeline.INDEFINITE);
-		timeline.play(); 
 		
 		
 		
