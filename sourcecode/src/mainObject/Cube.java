@@ -6,11 +6,18 @@ import force.Friction;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
-public class Cube extends MainObject/* implements Calculator*/{
+public class Cube extends MainObject implements Reset{
 	private static float MAXLENGTH = 300;
-	private FloatProperty sideLength = new SimpleFloatProperty(0);
+	private FloatProperty sideLength = new SimpleFloatProperty(100);
 
-
+	@Override
+	public void reset() {
+		this.setMass(0.1f);
+		this.setPosition(0);
+		this.setVelocity(0);
+		this.setAcceleration(0);
+		this.sideLength.set(100);
+	}
 
 	public Cube(float sizeLength) {
 	    super();
@@ -42,10 +49,6 @@ public class Cube extends MainObject/* implements Calculator*/{
 	}
 
 
-	public void updateTranslationMotion(AppliedForce appliedForce, Friction frictionForce, float f) {
-		// TODO Auto-generated method stub
-			
-	}
 	
 	
 
