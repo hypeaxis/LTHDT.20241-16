@@ -7,10 +7,10 @@ import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
 public abstract class MainObject {
-	private FloatProperty mass = new SimpleFloatProperty();
-	private FloatProperty position = new SimpleFloatProperty();
-	private FloatProperty velocity = new SimpleFloatProperty();
-	private FloatProperty acceleration = new SimpleFloatProperty();
+	private FloatProperty mass = new SimpleFloatProperty(0.1f);
+	private FloatProperty position = new SimpleFloatProperty(0);
+	private FloatProperty velocity = new SimpleFloatProperty(0);
+	private FloatProperty acceleration = new SimpleFloatProperty(0);
 	
 	public MainObject() {
 		// TODO Auto-generated constructor stub
@@ -60,11 +60,14 @@ public abstract class MainObject {
 	}
 	
 	public void updateTranslationMotion(AppliedForce F, Friction friction, float deltatime) {
-		this.acceleration.set((F.getValue() - friction.getValue()) / this.mass.get());;
+		if(F != null && friction != null) {
+			this.acceleration.set((F.getValue() - friction.getValue()) / this.mass.get());;			
+			
+			this.velocity.set(this.velocity.get() + this.acceleration.get() * deltatime);
+			
+			this.position.set(this.position.get() + this.velocity.get() * deltatime);
+		}
 		
-		this.velocity.set(this.velocity.get() + this.acceleration.get() * deltatime);
-		
-		this.position.set(this.position.get() + this.velocity.get() * deltatime);
 	}
 
 	

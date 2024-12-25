@@ -153,7 +153,7 @@ public class Controller {
 	public void updateFrictionPosition(Friction fric, AppliedForce force) {
 		if (fric.getValue() == 0) {
 	        friction.setVisible(false);
-	    } else if (force.getValue() > 0) {
+	    } else if (fric.getValue() > 0) {
 	        friction.setVisible(true);
 	        friction.setRotate(180);
 	        friction.setLayoutX(Xdrop - fric.getValue());
@@ -164,7 +164,7 @@ public class Controller {
 	        friction.setRotate(0);
 	        friction.setLayoutX(Xdrop);
 	        friction.setLayoutY(Ydrop-15);
-	        friction.setFitWidth(fric.getValue());
+	        friction.setFitWidth(-fric.getValue());
 	    }
 	}
 	
@@ -201,7 +201,8 @@ public class Controller {
 		setDraggable(Cube, cube);
 		setDraggable(Cylinder, cylinder);
 		
-		
+	    
+	    
 		ContextMenu cubeContextMenu = new ContextMenu();
 	    MenuItem cubeMenuItem1 = new MenuItem("Size-length");
 	    MenuItem cubeMenuItem2 = new MenuItem("Mass");
@@ -224,7 +225,7 @@ public class Controller {
 	    cubeMenuItem2.setOnAction(event -> {
 	    	showInputDialog(Cube, "Mass: ", value -> {
 	    		cube.setMass(value);
-	    	});	    	
+	    	});
 	    });
 	    	    
 	    cylinderMenuItem1.setOnAction(event -> {
@@ -238,7 +239,7 @@ public class Controller {
 	    cylinderMenuItem2.setOnAction(event -> {
 	    	showInputDialog(Cylinder, "Mass: ", value -> {
 	    		cylinder.setMass(value);
-	    	});	    	
+	    	});
 	    });
 	    
 		numberOfObjects.addListener((obs, oldVal, newVal) -> {
@@ -263,22 +264,6 @@ public class Controller {
 				cylinderContextMenu.show(Cylinder, event.getScreenX(), event.getScreenY());
 	    	}
 	    });
-		
-	    ChangeListener<? super Number> listener = (obs, oldValue, newValue) -> {
-	    	if("Cube".equals(typeOfObject.get())) {
-	    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
-	    		gravity.calculateGravity(cube);
-	    		normal.calculateNormalForce(gravity);
-	    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
-	    		updateFrictionPosition(frictionForce, appliedForce);
-	    	} else if ("Cylinder".equals(typeOfObject.get())) {
-	    		updateAppliedPosition(appliedForce, cylinder.getRadius());
-	    		gravity.calculateGravity(cylinder);
-	    		normal.calculateNormalForce(gravity);
-	    		frictionForce.calculateFriction(surface, cylinder, normal, appliedForce);
-	    		updateFrictionPosition(frictionForce, appliedForce);
-	    	}
-	    };
 	    
 		
 		appliedSlider.valueProperty().bindBidirectional(appliedForce.getValueProperty());
@@ -292,7 +277,7 @@ public class Controller {
 	        }
 	    });
 	    
-	    appliedForce.getValueProperty().addListener(listener);
+
 	    
 		staticSlider.valueProperty().bindBidirectional(surface.getStaticProperty());
 		staticField.textProperty().bindBidirectional(staticSlider.valueProperty(), new NumberStringConverter());
@@ -304,7 +289,7 @@ public class Controller {
 	        }
 	    });
 		
-		surface.getStaticProperty().addListener(listener);
+
 		
 		kineticSlider.valueProperty().bindBidirectional(surface.getKineticProperty());
 		kineticField.textProperty().bindBidirectional(kineticSlider.valueProperty(), new NumberStringConverter());
@@ -316,30 +301,34 @@ public class Controller {
 	        }
 	    });
 		
-		surface.getKineticProperty().addListener(listener);
+
 	    
-		
+
 	    
 		Timeline timeline = new Timeline(
 			new KeyFrame(Duration.millis(16), event -> {
 
-				
 				if("Cube".equals(typeOfObject.get())) {
-					cube.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
-					System.out.println(cube.getPosition());
-				} else if ("Cylinder".equals(typeOfObject.get())) {
-					cylinder.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
+		    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
+		    		gravity.calculateGravity(cube);
+		    		normal.calculateNormalForce(gravity);
+		    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
+		    		updateFrictionPosition(frictionForce, appliedForce);
+		    		cube.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
+		    		System.out.println("p: "+cube.getPosition());
+		    		System.out.println("v: "+cube.getVelocity());
+		    		System.out.println("a: "+cube.getAcceleration());
+		    	} else if ("Cylinder".equals(typeOfObject.get())) {
+		    		updateAppliedPosition(appliedForce, cube.getSizeLength()/2);
+		    		gravity.calculateGravity(cube);
+		    		normal.calculateNormalForce(gravity);
+		    		frictionForce.calculateFriction(surface, cube, normal, appliedForce);
+		    		updateFrictionPosition(frictionForce, appliedForce);
+		    		cylinder.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
 					cylinder.updateRotationMotion(appliedForce, frictionForce, 0.016f);
-				}
-
-					background.setLayoutX(background.getLayoutX() - 2);
-					background2.setLayoutX(background2.getLayoutX() - 2);
-				if(background.getLayoutX() <= -1200) {
-					background.setLayoutX(background2.getLayoutX() + 1200);
-				}
-				if(background2.getLayoutX() <= -1200) {
-					background2.setLayoutX(background.getLayoutX() + 1200);
-				}
+		    	}
+				
+				
 			})
 		);
 		

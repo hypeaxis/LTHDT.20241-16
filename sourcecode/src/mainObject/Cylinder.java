@@ -8,10 +8,10 @@ import javafx.beans.property.SimpleFloatProperty;
 
 public class Cylinder extends MainObject /*implements Calculator*/{
 	private static float MAXRADIUS = 150;
-	private FloatProperty radius = new SimpleFloatProperty();
-	private FloatProperty angularPosition = new SimpleFloatProperty();
-	private FloatProperty angularVelocity = new SimpleFloatProperty();
-	private FloatProperty angularAcceleration = new SimpleFloatProperty();
+	private FloatProperty radius = new SimpleFloatProperty(0);
+	private FloatProperty angularPosition = new SimpleFloatProperty(0);
+	private FloatProperty angularVelocity = new SimpleFloatProperty(0);
+	private FloatProperty angularAcceleration = new SimpleFloatProperty(0);
 
 
 	public Cylinder(float radius) {
