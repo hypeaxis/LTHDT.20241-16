@@ -27,6 +27,6 @@ public class ForceSimulator extends Application{
 		
 	}
 
-}
+} 
 
 

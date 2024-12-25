@@ -28,7 +28,7 @@ public class Surface {
 	}
 	public void setStaticCoefficient(float staticCoefficent) {
 		this.staticCoefficient.set(staticCoefficent);
-	}
+	} 
 	
 
 

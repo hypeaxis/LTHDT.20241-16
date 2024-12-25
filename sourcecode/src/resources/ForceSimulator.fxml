@@ -16,8 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<Pane fx:id="border" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simulator.Controller">
+<Pane fx:id="border" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simulator.Controller">
    <children>
       <ImageView fx:id="background" fitHeight="240.0" fitWidth="1200.0" layoutY="300.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -97,7 +96,7 @@
                   <RowConstraints maxHeight="76.0" minHeight="10.0" prefHeight="52.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <TextField fx:id="appliedField" disable="true" prefHeight="31.0" prefWidth="207.0" text="5" />
+                  <TextField fx:id="appliedField" disable="true" prefHeight="31.0" prefWidth="207.0" />
                   <Slider fx:id="appliedSlider" disable="true" max="500.0" min="-500.0" showTickLabels="true" showTickMarks="true" GridPane.rowIndex="1" />
                </children>
                <GridPane.margin>
@@ -127,8 +126,8 @@
                   </Label>
                   <TextField fx:id="staticField" GridPane.columnIndex="1" />
                   <TextField fx:id="kineticField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Slider fx:id="staticSlider" max="10.0" GridPane.columnIndex="2" />
-                  <Slider fx:id="kineticSlider" max="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Slider fx:id="staticSlider" majorTickUnit="1.0" max="5.0" showTickLabels="true" showTickMarks="true" GridPane.columnIndex="2" />
+                  <Slider fx:id="kineticSlider" majorTickUnit="1.0" max="5.0" showTickLabels="true" showTickMarks="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                </children>
                <GridPane.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" />

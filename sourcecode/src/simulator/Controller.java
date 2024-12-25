@@ -92,7 +92,7 @@ public class Controller {
 			if(!isdragged ) {
 				return;
 			}
-			
+			 
 			if(localY == startY) {
 				if(numberOfObjects.get() == 0 && obj.getLayoutY() <= 490 && obj.getLayoutY() >= 0) {
 					obj.setLayoutX(Xdrop - obj.getFitHeight()/2);
@@ -186,7 +186,7 @@ public class Controller {
 	        applied.setFitWidth(-force.getValue());
 	    }
 	}
-	
+	 
 	
 	public void initialize() {
 		Xdrop = border.getPrefWidth()/2;
@@ -344,32 +344,64 @@ public class Controller {
 		surface.getKineticProperty().addListener(listener);
 	    
 		
+		kineticSlider.valueProperty().bindBidirectional(surface.getKineticProperty());
+		kineticField.textProperty().bindBidirectional(kineticSlider.valueProperty(), new NumberStringConverter());
+		kineticField.textProperty().bindBidirectional(surface.getKineticProperty(), new NumberStringConverter());
+		
+		kineticField.textProperty().addListener((obs, oldValue, newValue) -> {
+		    try {
+		        // ktra gtri moi co hop le ko, hop le thi giu nguyen khong thi hien do
+		        if (!newValue.matches("-?\\d*(\\.\\d*)?")) {
+		            throw new IllegalArgumentException("Invalid input in kineticField");
+		        }
+		        kineticField.setStyle(""); // tra ve mau trang
+		    } catch (IllegalArgumentException e) {
+		        kineticField.setStyle("-fx-border-color: red; -fx-background-color: lightpink;"); // Đổi màu viền và nền khi nhập sai
+		    }
+		});;
+		
+		surface.getKineticProperty().addListener(listener);
+	    
+		
 	    
 		Timeline timeline = new Timeline(
-			new KeyFrame(Duration.millis(16), event -> {
+			    new KeyFrame(Duration.millis(16), event -> {
+			        
+			        // Cập nhật chuyển động cho Cube
+			        if ("Cube".equals(typeOfObject.get())) {
+			            // Cập nhật chuyển động dịch chuyển của Cube
+			            cube.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
+			            System.out.println(cube.getPosition());
+			        } 
+			        // Cập nhật chuyển động cho Cylinder
+			        else if ("Cylinder".equals(typeOfObject.get())) {
+			            // Cập nhật chuyển động dịch chuyển và quay của Cylinder
+			            cylinder.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
+			            cylinder.updateRotationMotion(appliedForce, frictionForce, 0.016f);
+			        }
+ 
+			        // Di chuyển nền (background) dựa trên giá trị lực
+			        double backgroundShift = -appliedForce.getValue() * 0.016f;  // Dựa trên lực
+			        background.setLayoutX(background.getLayoutX() + backgroundShift);
+			        background2.setLayoutX(background2.getLayoutX() + backgroundShift);
 
-				
-				if("Cube".equals(typeOfObject.get())) {
-					cube.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
-					System.out.println(cube.getPosition());
-				} else if ("Cylinder".equals(typeOfObject.get())) {
-					cylinder.updateTranslationMotion(appliedForce, frictionForce, 0.016f);
-					cylinder.updateRotationMotion(appliedForce, frictionForce, 0.016f);
-				}
+			        // Cập nhật vị trí nền khi nó ra ngoài màn hình
+			        if (background.getLayoutX() <= -1200) {
+			            background.setLayoutX(background2.getLayoutX() + 1200);
+			        }
+			        if (background2.getLayoutX() <= -1200) {
+			            background2.setLayoutX(background.getLayoutX() + 1200);
+			        }
+			    })
+			);
 
-					background.setLayoutX(background.getLayoutX() - 2);
-					background2.setLayoutX(background2.getLayoutX() - 2);
-				if(background.getLayoutX() <= -1200) {
-					background.setLayoutX(background2.getLayoutX() + 1200);
-				}
-				if(background2.getLayoutX() <= -1200) {
-					background2.setLayoutX(background.getLayoutX() + 1200);
-				}
-			})
-		);
-		
-		timeline.setCycleCount(Timeline.INDEFINITE);
-		timeline.play(); 
+			// Thiết lập để Timeline chạy mãi mãi
+			timeline.setCycleCount(Timeline.INDEFINITE);
+			timeline.play();
+
+
+
+
 		
 		
 		
