@@ -6,5 +6,8 @@ public class AppliedForce extends Force{
 		super();
 	}
 	
-	
+	public void setValue(float value) {
+		this.setValue(value);
+		
+	}
 }

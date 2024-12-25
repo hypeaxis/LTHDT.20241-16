@@ -7,7 +7,7 @@ import force.Gravity;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
-public abstract class MainObject{
+public abstract class MainObject {
 
 	private FloatProperty mass = new SimpleFloatProperty(0.1f);
 	private FloatProperty position = new SimpleFloatProperty(0);
@@ -35,25 +35,10 @@ public abstract class MainObject{
 		return mass;
 	}
 
-
-	
 	public void setMass(float mass) {
-		this.mass.set(mass);
+	    this.mass.set(mass); // Gán giá trị mass vào thuộc tính
 	}
-
-	public void setPosition(float position) {
-		this.position.set(position);
-	}
-
-	public void setVelocity(float velocity) {
-		this.velocity.set(velocity);
-	}
-
-	public void setAcceleration(float acceleration) {
-		this.acceleration.set(acceleration);
-	}
-
-
+	
 	public float getPosition() {
 		return position.get();
 	}
@@ -80,13 +65,13 @@ public abstract class MainObject{
 	}
 	
 	public void updateTranslationMotion(AppliedForce F, Friction friction, float deltatime) {
-
-		this.acceleration.set((F.getValue() - friction.getValue()) / this.mass.get());;			
-		
-		this.velocity.set(this.velocity.get() + this.acceleration.get() * deltatime);
-		
-		this.position.set(this.position.get() + this.velocity.get() * deltatime);
-
+		if(F != null && friction != null) {
+			this.acceleration.set((F.getValue() - friction.getValue()) / this.mass.get());;			
+			
+			this.velocity.set(this.velocity.get() + this.acceleration.get() * deltatime);
+			
+			this.position.set(this.position.get() + this.velocity.get() * deltatime);
+		}
 		
 
 	}
@@ -102,5 +87,4 @@ public abstract class MainObject{
 	    // Tính lại giá trị gravity
 	    gravity.calculateGravity(this);
 	}
-
 }

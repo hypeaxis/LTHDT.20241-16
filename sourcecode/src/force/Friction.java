@@ -14,8 +14,8 @@ public class Friction extends Force{
 
 	public void calculateFriction(Surface surface, MainObject obj, NormalForce N, AppliedForce F) {
 
-		if(obj.getVelocity() <= 0.11 && obj.getVelocity() >= -0.11) {
-			obj.setVelocity(0);
+		if(obj.getVelocity() == 0) {
+			
 			if(F.getValue()>=0) {
 				if(obj instanceof Cube) {
 					if(F.getValue() <= N.getValue() * surface.getStaticCoefficient()) {
